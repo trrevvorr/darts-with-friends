@@ -70,3 +70,8 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/de
 ### `npm run build` fails to minify
 
 This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+
+## Useful Documentation
+- [MaterialUI Component Library](https://material-ui.com/)
+- [Material Design Icons](https://material.io/resources/icons/?style=baseline)
+- [Darts With Friends](http://darts-with-friends.s3-website-us-east-1.amazonaws.com/)
