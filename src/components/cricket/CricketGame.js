@@ -2,9 +2,8 @@ import React from 'react';
 import HeaderBar from "../general/HeaderBar";
 import Container from "@material-ui/core/Container";
 import { makeStyles } from '@material-ui/core/styles';
-import Fab from '@material-ui/core/Fab';
-import Done from '@material-ui/icons/Done';
 import CricketScoreBoard from './CricketScoreBoard'
+import ButtonBar from './ButtonBar';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -43,11 +42,10 @@ export default function CricketGame(props) {
                 leftScore={props.turnState.leftScore} 
                 rightScore={props.turnState.rightScore} 
                 leftMarks={props.turnState.leftMarks} 
-                rightMarks={props.turnState.rightMarks} 
+                rightMarks={props.turnState.rightMarks}
+                turnNumber={props.turnNumber}
             />
-            <Fab color="primary" size="large" className={classes.fab} >
-                <Done/>
-            </Fab>
+            <ButtonBar />
         </Container>
       </div>
     </div>

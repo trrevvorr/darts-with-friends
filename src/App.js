@@ -10,9 +10,9 @@ class App extends React.Component {
     this.state = {
       history: [
         {
-          leftMarks: { "20": 2, "19": 3, "18": 4, "17": 0, "16": 0, "15": 0, "B": 0 },
+          leftMarks: { "20": 2, "19": 3, "18": 4, "17": 0, "16": 3, "15": 0, "B": 0 },
           leftScore: 18,
-          rightMarks: { "20": -1, "19": 0, "18": 1, "17": 0, "16": 0, "15": 0, "B": 0 },
+          rightMarks: { "20": -1, "19": 0, "18": 1, "17": 0, "16": 7, "15": 0, "B": 0 },
           rightScore: 0,
         }
       ],
@@ -40,7 +40,8 @@ class App extends React.Component {
         <CricketGame 
           leftPlayer={currentState.leftPlayer} 
           rightPlayer={currentState.rightPlayer} 
-          turnState={currentTurnState} 
+          turnState={currentTurnState}
+          turnNumber={currentState.turnNumber}
         />
       </div>
     );
