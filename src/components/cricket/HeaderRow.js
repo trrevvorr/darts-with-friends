@@ -28,10 +28,10 @@ const useStyles = makeStyles(theme => ({
         fontSize: "40px",
         color: grey[500],
     },
-    leftPlayerName: {
+    leftSide: {
         textAlign: "left",
     },
-    rightPlayerName: {
+    rightSide: {
         textAlign: "right",
     },
     totalScore: {
@@ -40,6 +40,10 @@ const useStyles = makeStyles(theme => ({
     scoreDiff: {
         marginTop: "4vh",
         lineHeight: "6vh",
+    },
+    playerName: {
+        marginTop: "1vh",
+        lineHeight: "4vh",
     }
 }));
 
@@ -50,32 +54,38 @@ export default function HeaderRow(props) {
 
   return (
     <Grid container xs={12} className={classes.headerRow}>
-        <Grid container xs={5}>
+        <Grid container xs={5} className={classes.leftSide}>
             <Grid container xs={12}>
                 <Grid item xs={4}><AccountCircle className={classes.profilePicture} /></Grid>
-                <Grid item xs={8}>
-                    <Typography variant="h6" className={classes.leftPlayerName}>{props.leftPlayer}</Typography>
+                <Grid container xs={8}>
+                    <Grid item xs={12}>
+                        <Typography variant="h5" className={classes.playerName}>{props.leftPlayer}</Typography>
+                    </Grid>
                 </Grid>
             </Grid>
             <Grid container xs={12}>
                 <Grid item xs={4}>
                     <Typography variant="h4" className={classes.totalScore}>{leftScore}</Typography>
                 </Grid>
-                <Grid item xs={8}></Grid>
+                <Grid item xs={8}>
+                    <Typography variant="subtitle2">{getLosingOrWinningText (leftScore, rightScore, true)}</Typography>
+                </Grid>
             </Grid>
         </Grid>
         <Grid item xs={2}>
             {getScoreDiffElement(leftScore, rightScore, props.turnNumber, classes)}
         </Grid>
-        <Grid container xs={5}>
+        <Grid container xs={5} className={classes.rightSide}>
             <Grid container xs={12}>
                 <Grid item xs={8}>
-                    <Typography variant="h6" className={classes.rightPlayerName}>{props.rightPlayer}</Typography>
+                    <Typography variant="h5" className={classes.playerName}>{props.rightPlayer}</Typography>
                 </Grid>
                 <Grid item xs={4}><AccountCircle className={classes.profilePicture} /></Grid>
             </Grid>
             <Grid container xs={12}>
-                <Grid item xs={8}></Grid>
+                <Grid item xs={8}>
+                    <Typography variant="subtitle2">{getLosingOrWinningText (leftScore, rightScore, false)}</Typography>
+                </Grid>
                 <Grid item xs={4}>
                     <Typography variant="h4" className={classes.totalScore}>{rightScore}</Typography>
                 </Grid>
@@ -102,6 +112,30 @@ function getScoreDiffElement (leftScore, rightScore, turnNumber, classes) {
     }
 
     return <Typography variant="h3" className={[classes.scoreDiff, className]}>{scoreDiffStr}</Typography>
+}
+
+function getLosingOrWinningText (leftScore, rightScore, isLeftPlayer) {
+    let losingOrWinningOrTie;
+    let currPlayerScore;
+    let otherScore;
+
+    if (isLeftPlayer) {
+        currPlayerScore = leftScore;
+        otherScore = rightScore;
+    } else {
+        currPlayerScore = rightScore;
+        otherScore = leftScore;
+    }
+    
+    if (currPlayerScore < otherScore) {
+        losingOrWinningOrTie = "losing";
+    } else if (currPlayerScore === otherScore) {
+        losingOrWinningOrTie = "tied";
+    } else {
+        losingOrWinningOrTie = "winning"; 
+    }
+
+    return losingOrWinningOrTie;
 }
 
 function calcScoreDiff(leftScore, rightScore, turnNumber) {
