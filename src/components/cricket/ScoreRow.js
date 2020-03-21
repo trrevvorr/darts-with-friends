@@ -44,19 +44,24 @@ const useStyles = makeStyles(theme => ({
         lineHeight: "9vh",
     },
     leftSideMarksScored: {
-        textAlign: "right",
-        marginRight: "-5px",
+        textAlign: "left",
+        marginLeft: "14px",
     },
     rightSideMarksScored: {
-        textAlign: "left",
-        marginLeft: "-5px",
+        textAlign: "right",
+        marginRight: "14px",
     },
     // the "/" and "X" icons denoting marks scored per number
     markIcon: {
         height: "9vh",
         display: "flex",
         alignItems: "center",
-        justifyContent: "center",
+    },
+    leftMarkIcon: {
+        marginLeft: "7px",
+    },
+    rightMarkIcon: {
+        marginRight: "7px",
     }
 }));
 
@@ -72,7 +77,7 @@ export default function ScoreRow(props) {
                     {getPointsScoredEl(props.leftMarks, props.number, classes, props.isLeftPlayersTurn)}
                 </Grid>
                 <Grid item xs={5}>
-                    <Typography className={classes.markIcon} variant="h4"><MarkIcon marks={props.leftMarks} /></Typography>
+                    <Typography className={[classes.markIcon, classes.leftMarkIcon].join(" ")} variant="h4"><MarkIcon marks={props.leftMarks} /></Typography>
                 </Grid>
                 <Grid item xs={2}>
                     {getLeftMarksScoredEl(props.number, props.isLeftPlayersTurn, props.turnHistory, classes)}
@@ -86,7 +91,7 @@ export default function ScoreRow(props) {
                     {getRightMarksScoredEl(props.number, !props.isLeftPlayersTurn, props.turnHistory, classes)}
                 </Grid>
                 <Grid item xs={5}>
-                    <Typography className={classes.markIcon} variant="h4"><MarkIcon marks={props.rightMarks} /></Typography>
+                    <Typography className={[classes.markIcon, classes.rightMarkIcon].join(" ")} variant="h4"><MarkIcon marks={props.rightMarks} /></Typography>
                 </Grid>
                 <Grid item xs={5}>
                     {getPointsScoredEl(props.rightMarks, props.number, classes, !props.isLeftPlayersTurn)}
