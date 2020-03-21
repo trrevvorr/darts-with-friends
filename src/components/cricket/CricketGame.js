@@ -4,6 +4,7 @@ import Container from "@material-ui/core/Container";
 import { makeStyles } from '@material-ui/core/styles';
 import CricketScoreBoard from './CricketScoreBoard'
 import ButtonBar from './ButtonBar';
+import { isLeftPlayersTurn } from "../../helpers/cricket/Calculations"
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -35,7 +36,7 @@ export default function CricketGame(props) {
                         rightScore={props.turnState.rightScore}
                         leftMarks={props.turnState.leftMarks}
                         rightMarks={props.turnState.rightMarks}
-                        turnNumber={props.turnState.turnNumber}
+                        isLeftPlayersTurn={isLeftPlayersTurn(props.turnState.turnNumber)}
                         addNewMark={props.addNewMark}
                     />
                     <ButtonBar endTurn={props.endTurn} undoAction={props.undoAction} />

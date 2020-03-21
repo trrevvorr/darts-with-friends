@@ -6,7 +6,7 @@ import Button from '@material-ui/core/Button';
 
 const useStyles = makeStyles(theme => ({
     buttonBar: {
-        paddingBottom: "5px",
+        marginTop: "1vh",
         height: "10vh",
     },
     button: {

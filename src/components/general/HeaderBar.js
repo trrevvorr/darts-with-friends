@@ -6,7 +6,6 @@ import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import MoreVert from '@material-ui/icons/MoreVert';
-import Undo from '@material-ui/icons/Undo';
 
 const useStyles = makeStyles(theme => ({
   menuButton: {
@@ -34,9 +33,6 @@ export default function ButtonAppBar() {
           <Typography variant="h6" className={classes.title}>
             Cricket
           </Typography>
-          <IconButton edge="start" color="inherit" aria-label="undo" className={classes.menuButton} >
-            <Undo />
-          </IconButton>
           <IconButton edge="start" color="inherit" aria-label="more">
             <MoreVert />
           </IconButton>

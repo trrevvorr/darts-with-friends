@@ -23,21 +23,26 @@ export default function CricketScoreBoard(props) {
                     rightPlayer={props.rightPlayer} 
                     leftMarks={props.leftMarks} 
                     rightMarks={props.rightMarks} 
-                    turnNumber={props.turnNumber}
+                    isLeftPlayersTurn={props.isLeftPlayersTurn}
                 />
-                {BuildScoreRows(props.leftMarks, props.rightMarks, props.addNewMark)}
+                {BuildScoreRows(props.leftMarks, props.rightMarks, props.addNewMark, props.isLeftPlayersTurn)}
             </Grid>
         </div>
     );
 }
 
-function BuildScoreRows(leftMarks, rightMarks, addNewMark) {
+function BuildScoreRows(leftMarks, rightMarks, addNewMark, isLeftPlayersTurn) {
     let scoreRows = [];
-    for (let i = 20; i >= 15; i--) {
-        let n = i.toString();
-        scoreRows.push(<ScoreRow number={n} leftMarks={leftMarks[n]} rightMarks={rightMarks[n]} addNewMark={addNewMark} key={i} />);
-    }
-    scoreRows.push(<ScoreRow number={"B"} leftMarks={leftMarks["B"]} rightMarks={rightMarks["B"]} addNewMark={addNewMark} />);
+    ["20", "19", "18", "17", "16", "15", "B"].forEach(n => {
+        scoreRows.push(<ScoreRow
+            number={n}
+            leftMarks={leftMarks[n]}
+            rightMarks={rightMarks[n]}
+            addNewMark={addNewMark}
+            key={n} 
+            isLeftPlayersTurn={isLeftPlayersTurn}
+        />);
+    });
 
     return scoreRows;
 }

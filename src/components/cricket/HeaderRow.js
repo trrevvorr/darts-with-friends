@@ -2,17 +2,19 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import { Typography } from '@material-ui/core';
+import { calcTotalPointsScored } from "../../helpers/cricket/Calculations"
+
 import red from '@material-ui/core/colors/red';
 import green from '@material-ui/core/colors/green';
 import grey from '@material-ui/core/colors/grey';
 import indigo from '@material-ui/core/colors/indigo';
-import { calcTotalPointsScored, isLeftPlayersTurn } from "../../helpers/cricket/Calculations"
+
 
 const useStyles = makeStyles(theme => ({
     headerRow: {
-        paddingBottom: "3vh",
+        paddingBottom: "2vh",
         marginBottom: "3vh",
-        height: "14vh",
+        height: "13vh",
         borderBottom: "2px solid " + indigo[500],
     },
     positiveScore: {
@@ -43,6 +45,12 @@ const useStyles = makeStyles(theme => ({
     playerName: {
         marginTop: "1vh",
         lineHeight: "4vh",
+    },
+    activeSide: {
+
+    },
+    inactiveSide: {
+        color: grey[500],
     }
 }));
 
@@ -50,10 +58,12 @@ export default function HeaderRow(props) {
   const classes = useStyles();
   const leftScore = calcTotalPointsScored(props.leftMarks);
   const rightScore = calcTotalPointsScored(props.rightMarks);
+  const leftSideClasses = getLeftSideClasses(props.isLeftPlayersTurn, classes);
+  const rightSideClasses = getRightSideClasses(!props.isLeftPlayersTurn, classes);
 
   return (
     <Grid container xs={12} className={classes.headerRow}>
-        <Grid container xs={5} className={classes.leftSide}>
+        <Grid container xs={4} className={leftSideClasses}>
             <Grid item xs={12}>
                 <Typography variant="h4" className={classes.playerName}>{props.leftPlayer}</Typography>
             </Grid>
@@ -61,10 +71,10 @@ export default function HeaderRow(props) {
                 <Typography variant="h4" className={classes.totalScore}>{leftScore}</Typography>
             </Grid>
         </Grid>
-        <Grid item xs={2}>
-            {getScoreDiffElement(leftScore, rightScore, props.turnNumber, classes)}
+        <Grid item xs={4}>
+            {getScoreDiffElement(leftScore, rightScore, props.isLeftPlayersTurn, classes)}
         </Grid>
-        <Grid container xs={5} className={classes.rightSide}>
+        <Grid container xs={4} className={rightSideClasses}>
             <Grid item xs={12}>
                 <Typography variant="h4" className={classes.playerName}>{props.rightPlayer}</Typography>
             </Grid>
@@ -76,8 +86,28 @@ export default function HeaderRow(props) {
   );
 }
 
-function getScoreDiffElement (leftScore, rightScore, turnNumber, classes) {
-    const scoreDiff = calcScoreDiff(leftScore, rightScore, turnNumber)
+function getLeftSideClasses(isLeftPlayersTurn, classes) {
+    const leftSideClasses = [classes.leftSide];
+    if (isLeftPlayersTurn) {
+        leftSideClasses.push(classes.activeSide);
+    } else {
+        leftSideClasses.push(classes.inactiveSide);
+    }
+    return leftSideClasses;
+}
+
+function getRightSideClasses(isRightPlayersTurn, classes) {
+    const rightSideClasses = [classes.rightSide];
+    if (isRightPlayersTurn) {
+        rightSideClasses.push(classes.activeSide);
+    } else {
+        rightSideClasses.push(classes.inactiveSide);
+    }
+    return rightSideClasses;
+}
+
+function getScoreDiffElement (leftScore, rightScore, isLeftPlayersTurn, classes) {
+    const scoreDiff = calcScoreDiff(leftScore, rightScore, isLeftPlayersTurn)
     let className;
     let scoreDiffStr;
 
@@ -95,8 +125,8 @@ function getScoreDiffElement (leftScore, rightScore, turnNumber, classes) {
     return <Typography variant="h3" className={[classes.scoreDiff, className]}>{scoreDiffStr}</Typography>
 }
 
-function calcScoreDiff(leftScore, rightScore, turnNumber) {
-    if (isLeftPlayersTurn(turnNumber)) {
+function calcScoreDiff(leftScore, rightScore, isLeftPlayersTurn) {
+    if (isLeftPlayersTurn) {
         return (leftScore - rightScore);
     } else {
         return (rightScore - leftScore);
