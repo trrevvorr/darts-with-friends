@@ -28,7 +28,12 @@ export function isLeftPlayersTurn(turnNumber) {
     // if even turn num, left player's turn
     return !Boolean(turnNumber % 2);
 }
-
-export function calcMinThrowsForMarks(marks) {
-    return Math.floor(marks / 3) + (marks % 3 ? 1 : 0);
+/**
+ * given a number of marks, calculate the minimum number of throws that could be used to achieve that number of marks
+ * @param {int} marks number of marks for the given number (e.g. one triple === three marks)
+ * @param {string} number the number that was hit (one of the "numbers" around the outside of the dartboard, including bullseye as "B")
+ */
+export function calcMinThrowsForMarks(marks, number) {
+    const maxMarksPerDart = (number === "B" ? 2 : 3);
+    return Math.floor(marks / maxMarksPerDart) + (marks % maxMarksPerDart ? 1 : 0);
 }

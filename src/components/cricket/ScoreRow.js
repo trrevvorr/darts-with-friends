@@ -16,6 +16,7 @@ const useStyles = makeStyles(theme => ({
         height: "9vh",
         lineHeight: "9vh",
     },
+    // number of points scored (when greater than 3 marks scored)
     positivePointsScoredOnNumber: {
         color: green[200],
     },
@@ -25,9 +26,7 @@ const useStyles = makeStyles(theme => ({
     pointsScoredOnNumber: {
         lineHeight: "9vh",
     },
-    marksScoredOnNumber: {
-        lineHeight: "9vh",
-    },
+    // the left and right sides of the row (left and right player)
     leftSide: {
         textAlign: "left",
     },
@@ -35,17 +34,24 @@ const useStyles = makeStyles(theme => ({
         textAlign: "right",
     },
     activeSide: {
-
-    },
-    leftSideMarksScored: {
-        textAlign: "right",
-    },
-    rightSideMarksScored: {
-        textAlign: "left",
+        
     },
     inactiveSide: {
         color: grey[500],
     },
+    // count of marks scored per number for the current turn
+    marksScoredOnNumber: {
+        lineHeight: "9vh",
+    },
+    leftSideMarksScored: {
+        textAlign: "right",
+        marginRight: "-5px",
+    },
+    rightSideMarksScored: {
+        textAlign: "left",
+        marginLeft: "-5px",
+    },
+    // the "/" and "X" icons denoting marks scored per number
     markIcon: {
         height: "9vh",
         display: "flex",
@@ -62,10 +68,10 @@ export default function ScoreRow(props) {
     return (
         <Grid container item xs={12} className={classes.row}>
             <Grid container item xs={4} className={leftSideClasses.join(" ")}>
-                <Grid item xs={4}>
+                <Grid item xs={5}>
                     {getPointsScoredEl(props.leftMarks, props.number, classes, props.isLeftPlayersTurn)}
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={5}>
                     <Typography className={classes.markIcon} variant="h4"><MarkIcon marks={props.leftMarks} /></Typography>
                 </Grid>
                 <Grid item xs={2}>
@@ -79,10 +85,10 @@ export default function ScoreRow(props) {
                 <Grid item xs={2}>
                     {getRightMarksScoredEl(props.number, !props.isLeftPlayersTurn, props.turnHistory, classes)}
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={5}>
                     <Typography className={classes.markIcon} variant="h4"><MarkIcon marks={props.rightMarks} /></Typography>
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={5}>
                     {getPointsScoredEl(props.rightMarks, props.number, classes, !props.isLeftPlayersTurn)}
                 </Grid>
             </Grid>

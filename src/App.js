@@ -99,7 +99,7 @@ class App extends React.Component {
             const originalMarksScored = turnHistory[0][marksKey][n];
             const currentMarksScored = turnHistory[turnHistory.length - 1][marksKey][n];
             const numMarks = currentMarksScored - originalMarksScored;
-            numThrows += calcMinThrowsForMarks(numMarks);
+            numThrows += calcMinThrowsForMarks(numMarks, n);
         });
     
         return numThrows;
