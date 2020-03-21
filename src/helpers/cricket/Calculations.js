@@ -10,7 +10,7 @@ export function calcTotalPointsScored(marksList) {
 
 export function calcPointsScored(marks, number) {
     const extraMarks = marks - 3;
-    
+
     if (number === "B") {
         number = 25;
     } else {
@@ -27,4 +27,8 @@ export function calcPointsScored(marks, number) {
 export function isLeftPlayersTurn(turnNumber) {
     // if even turn num, left player's turn
     return !Boolean(turnNumber % 2);
+}
+
+export function calcMinThrowsForMarks(marks) {
+    return Math.floor(marks / 3) + (marks % 3 ? 1 : 0);
 }

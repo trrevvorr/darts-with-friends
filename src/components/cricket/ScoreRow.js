@@ -60,8 +60,8 @@ export default function ScoreRow(props) {
     const rightSideClasses = getRightSideClasses(!props.isLeftPlayersTurn, classes);
 
     return (
-        <Grid container xs={12} className={classes.row}>
-            <Grid container xs={4} className={leftSideClasses}>
+        <Grid container item xs={12} className={classes.row}>
+            <Grid container item xs={4} className={leftSideClasses.join(" ")}>
                 <Grid item xs={4}>
                     {getPointsScoredEl(props.leftMarks, props.number, classes, props.isLeftPlayersTurn)}
                 </Grid>
@@ -75,7 +75,7 @@ export default function ScoreRow(props) {
             <Grid item xs={4}>
                 <Button variant="outlined" onClick={() => props.addNewMark(props.number)}><Typography variant="h4">{props.number}</Typography></Button>
             </Grid>
-            <Grid container xs={4} className={rightSideClasses}>
+            <Grid container item xs={4} className={rightSideClasses.join(" ")}>
                 <Grid item xs={2}>
                     {getRightMarksScoredEl(props.number, !props.isLeftPlayersTurn, props.turnHistory, classes)}
                 </Grid>
@@ -122,7 +122,7 @@ function getPointsScoredEl(marks, number, classes, isActivePlayer) {
         classNames.push(classes.noPointsScoredOnNumber);
     }
 
-    return <Typography variant="h5" className={classNames}>{"+" + pointsScored}</Typography>
+    return <Typography variant="h5" className={classNames.join(" ")}>{"+" + pointsScored}</Typography>
 }
 
 function getLeftMarksScoredEl(number, isActivePlayer, turnHistory, classes) {
@@ -150,5 +150,5 @@ function getMarksScoredEl(isActivePlayer, marksThisTurn, classNames, classes) {
         classNames.push(classes.noPointsScoredOnNumber);
     }
 
-    return <Typography variant="h5" className={classNames}>{marksThisTurn}</Typography>
+    return <Typography variant="h5" className={classNames.join(" ")}>{marksThisTurn}</Typography>
 }

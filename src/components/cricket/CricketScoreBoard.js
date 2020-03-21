@@ -17,7 +17,7 @@ export default function CricketScoreBoard(props) {
 
     return (
         <div className={classes.root}>
-            <Grid container spacing={0}>
+            <Grid container item spacing={0}>
                 <HeaderRow 
                     leftPlayer={props.leftPlayer} 
                     rightPlayer={props.rightPlayer} 

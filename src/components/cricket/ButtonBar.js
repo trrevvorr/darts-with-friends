@@ -22,7 +22,7 @@ export default function ButtonBar(props) {
   const classes = useStyles();
 
   return (
-    <Grid container xs={12} className={classes.buttonBar} spacing={2}>
+    <Grid container item xs={12} className={classes.buttonBar} spacing={2}>
         <Grid item  xs={6}>
             <Button variant="contained" color="secondary" className={classes.button} onClick={props.undoAction}>
                 <Typography variant="h5">Undo</Typography>

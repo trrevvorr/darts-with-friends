@@ -3,7 +3,7 @@ import './App.css';
 import 'typeface-roboto';
 import Helmet from "react-helmet";
 import CricketGame from './components/cricket/CricketGame';
-import { isLeftPlayersTurn } from "./helpers/cricket/Calculations";
+import { isLeftPlayersTurn, calcMinThrowsForMarks } from "./helpers/cricket/Calculations";
 import { ThemeProvider } from "@material-ui/styles";
 import { CssBaseline, createMuiTheme } from "@material-ui/core";
 
@@ -33,6 +33,8 @@ class App extends React.Component {
         this.addNewMark = this.addNewMark.bind(this);
         this.endTurn = this.endTurn.bind(this);
         this.undoAction = this.undoAction.bind(this);
+        this.getTurnHistory = this.getTurnHistory.bind(this);
+        this.countThrowsThisTurn = this.countThrowsThisTurn.bind(this);
     }
 
     deepCopy(obj) {
@@ -44,14 +46,18 @@ class App extends React.Component {
         const newState = this.deepCopy(this.state);
         newState.history.push(this.deepCopy(newState.history[newState.actionNumber]));
         newState.actionNumber++;
+        const turnNumber = newState.history[newState.actionNumber].turnNumber;
 
-        if (isLeftPlayersTurn(newState.history[newState.actionNumber].turnNumber)) {
+        if (isLeftPlayersTurn(turnNumber)) {
             newState.history[newState.actionNumber].leftMarks[number]++;
         } else {
             newState.history[newState.actionNumber].rightMarks[number]++;
         }
 
-        this.setState(newState)
+        const numThrowsThisTurn = this.countThrowsThisTurn(this.getTurnHistory(newState), isLeftPlayersTurn(turnNumber));
+        if (numThrowsThisTurn <= 3) {
+            this.setState(newState)
+        }
     }
 
     endTurn() {
@@ -72,20 +78,37 @@ class App extends React.Component {
         }
     }
 
-    getTurnHistory() {
-        let actionNum = this.state.actionNumber; 
-        const currentTurn = this.state.history[actionNum].turnNumber;
+    getTurnHistory(state) {
+        let actionNum = state.actionNumber; 
+        const currentTurn = state.history[actionNum].turnNumber;
         const turnHistory = [];
 
-        while (actionNum >= 0 && this.state.history[actionNum].turnNumber === currentTurn) {
-            turnHistory.push(this.deepCopy(this.state.history[actionNum]));
+        while (actionNum >= 0 && state.history[actionNum].turnNumber === currentTurn) {
+            turnHistory.push(this.deepCopy(state.history[actionNum]));
             actionNum--;
         }
 
         return turnHistory.reverse();
     }
 
+    countThrowsThisTurn(turnHistory, isLeftsTurn) {
+        let numThrows = 0;
+        let marksKey = isLeftsTurn ? "leftMarks" : "rightMarks";
+
+        ["20", "19", "18", "17", "16", "15", "B"].forEach(n => {
+            const originalMarksScored = turnHistory[0][marksKey][n];
+            const currentMarksScored = turnHistory[turnHistory.length - 1][marksKey][n];
+            const numMarks = currentMarksScored - originalMarksScored;
+            numThrows += calcMinThrowsForMarks(numMarks);
+        });
+    
+        return numThrows;
+    }
+
     render() {
+        const turnHistory = this.getTurnHistory(this.state);
+        const numThrowsThisTurn = this.countThrowsThisTurn(turnHistory, isLeftPlayersTurn(this.state.turnNumber));
+
         return (
             <ThemeProvider theme={theme}>
                 <Helmet>
@@ -101,7 +124,8 @@ class App extends React.Component {
                     addNewMark={this.addNewMark}
                     endTurn={this.endTurn}
                     undoAction={this.undoAction}
-                    turnHistory={this.getTurnHistory()}
+                    turnHistory={turnHistory}
+                    numThrowsThisTurn={numThrowsThisTurn}
                 />
             </ThemeProvider>
         );

@@ -62,8 +62,8 @@ export default function HeaderRow(props) {
   const rightSideClasses = getRightSideClasses(!props.isLeftPlayersTurn, classes);
 
   return (
-    <Grid container xs={12} className={classes.headerRow}>
-        <Grid container xs={4} className={leftSideClasses}>
+    <Grid container item xs={12} className={classes.headerRow}>
+        <Grid container item xs={4} className={leftSideClasses.join(" ")}>
             <Grid item xs={12}>
                 <Typography variant="h4" className={classes.playerName}>{props.leftPlayer}</Typography>
             </Grid>
@@ -74,7 +74,7 @@ export default function HeaderRow(props) {
         <Grid item xs={4}>
             {getScoreDiffElement(leftScore, rightScore, props.isLeftPlayersTurn, classes)}
         </Grid>
-        <Grid container xs={4} className={rightSideClasses}>
+        <Grid container item xs={4} className={rightSideClasses.join(" ")}>
             <Grid item xs={12}>
                 <Typography variant="h4" className={classes.playerName}>{props.rightPlayer}</Typography>
             </Grid>
@@ -122,7 +122,7 @@ function getScoreDiffElement (leftScore, rightScore, isLeftPlayersTurn, classes)
         className = classes.positiveScore;
     }
 
-    return <Typography variant="h3" className={[classes.scoreDiff, className]}>{scoreDiffStr}</Typography>
+    return <Typography variant="h3" className={[classes.scoreDiff, className].join(" ")}>{scoreDiffStr}</Typography>
 }
 
 function calcScoreDiff(leftScore, rightScore, isLeftPlayersTurn) {
