@@ -24,12 +24,12 @@ export default function ButtonBar(props) {
   return (
     <Grid container xs={12} className={classes.buttonBar} spacing={2}>
         <Grid item  xs={6}>
-            <Button variant="outlined" color="secondary" className={classes.button} onClick={props.undoAction}>
+            <Button variant="contained" color="secondary" className={classes.button} onClick={props.undoAction}>
                 <Typography variant="h5">Undo</Typography>
             </Button>
         </Grid>
         <Grid item xs={6}>
-            <Button variant="outlined" color="primary" className={classes.button} onClick={props.endTurn}>
+            <Button variant="contained" color="primary" className={classes.button} onClick={props.endTurn}>
                 <Typography variant="h5">End Turn</Typography>
             </Button>
         </Grid>

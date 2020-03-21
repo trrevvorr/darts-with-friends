@@ -6,29 +6,29 @@ import HeaderRow from './HeaderRow';
 
 
 const useStyles = makeStyles(theme => ({
-  root: {
-    flexGrow: 1,
-    textAlign: "center",
-  },
+    root: {
+        flexGrow: 1,
+        textAlign: "center",
+    },
 }));
 
 export default function CricketScoreBoard(props) {
-  const classes = useStyles();
+    const classes = useStyles();
 
-  return (
-    <div className={classes.root}>
-        <Grid container spacing={0}>
-            <HeaderRow 
-                leftPlayer={props.leftPlayer} 
-                rightPlayer={props.rightPlayer} 
-                leftMarks={props.leftMarks} 
-                rightMarks={props.rightMarks} 
-                turnNumber={props.turnNumber}
-            />
-            {BuildScoreRows(props.leftMarks, props.rightMarks, props.addNewMark)}
-        </Grid>
-    </div>
-  );
+    return (
+        <div className={classes.root}>
+            <Grid container spacing={0}>
+                <HeaderRow 
+                    leftPlayer={props.leftPlayer} 
+                    rightPlayer={props.rightPlayer} 
+                    leftMarks={props.leftMarks} 
+                    rightMarks={props.rightMarks} 
+                    turnNumber={props.turnNumber}
+                />
+                {BuildScoreRows(props.leftMarks, props.rightMarks, props.addNewMark)}
+            </Grid>
+        </div>
+    );
 }
 
 function BuildScoreRows(leftMarks, rightMarks, addNewMark) {
