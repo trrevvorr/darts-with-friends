@@ -43,12 +43,12 @@ class App extends React.Component {
     addNewMark(number) {
         const newState = this.deepCopy(this.state);
         newState.history.push(this.deepCopy(newState.history[newState.actionNumber]));
-        newState.actionNumber += 1;
+        newState.actionNumber++;
 
         if (isLeftPlayersTurn(newState.history[newState.actionNumber].turnNumber)) {
-            newState.history[newState.actionNumber].leftMarks[number] += 1;
+            newState.history[newState.actionNumber].leftMarks[number]++;
         } else {
-            newState.history[newState.actionNumber].rightMarks[number] += 1;
+            newState.history[newState.actionNumber].rightMarks[number]++;
         }
 
         this.setState(newState)
@@ -57,8 +57,8 @@ class App extends React.Component {
     endTurn() {
         const newState = this.deepCopy(this.state);
         newState.history.push(this.deepCopy(newState.history[newState.actionNumber]));
-        newState.actionNumber += 1;
-        newState.history[newState.actionNumber].turnNumber += 1;
+        newState.actionNumber++;
+        newState.history[newState.actionNumber].turnNumber++;
 
         this.setState(newState);
     }
@@ -67,9 +67,22 @@ class App extends React.Component {
         if (this.state.actionNumber > 0) {
             const newState = this.deepCopy(this.state);
             newState.history.pop();
-            newState.actionNumber -= 1;
+            newState.actionNumber--;
             this.setState(newState);
         }
+    }
+
+    getTurnHistory() {
+        let actionNum = this.state.actionNumber; 
+        const currentTurn = this.state.history[actionNum].turnNumber;
+        const turnHistory = [];
+
+        while (actionNum >= 0 && this.state.history[actionNum].turnNumber === currentTurn) {
+            turnHistory.push(this.deepCopy(this.state.history[actionNum]));
+            actionNum--;
+        }
+
+        return turnHistory.reverse();
     }
 
     render() {
@@ -88,6 +101,7 @@ class App extends React.Component {
                     addNewMark={this.addNewMark}
                     endTurn={this.endTurn}
                     undoAction={this.undoAction}
+                    turnHistory={this.getTurnHistory()}
                 />
             </ThemeProvider>
         );

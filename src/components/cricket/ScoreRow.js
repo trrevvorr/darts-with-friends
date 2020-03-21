@@ -25,6 +25,9 @@ const useStyles = makeStyles(theme => ({
     pointsScoredOnNumber: {
         lineHeight: "9vh",
     },
+    marksScoredOnNumber: {
+        lineHeight: "9vh",
+    },
     leftSide: {
         textAlign: "left",
     },
@@ -33,6 +36,12 @@ const useStyles = makeStyles(theme => ({
     },
     activeSide: {
 
+    },
+    leftSideMarksScored: {
+        textAlign: "right",
+    },
+    rightSideMarksScored: {
+        textAlign: "left",
     },
     inactiveSide: {
         color: grey[500],
@@ -56,15 +65,21 @@ export default function ScoreRow(props) {
                 <Grid item xs={4}>
                     {getPointsScoredEl(props.leftMarks, props.number, classes, props.isLeftPlayersTurn)}
                 </Grid>
-                <Grid item xs={8}>
+                <Grid item xs={6}>
                     <Typography className={classes.markIcon} variant="h4"><MarkIcon marks={props.leftMarks} /></Typography>
+                </Grid>
+                <Grid item xs={2}>
+                    {getLeftMarksScoredEl(props.number, props.isLeftPlayersTurn, props.turnHistory, classes)}
                 </Grid>
             </Grid>
             <Grid item xs={4}>
                 <Button variant="outlined" onClick={() => props.addNewMark(props.number)}><Typography variant="h4">{props.number}</Typography></Button>
             </Grid>
             <Grid container xs={4} className={rightSideClasses}>
-                <Grid item xs={8}>
+                <Grid item xs={2}>
+                    {getRightMarksScoredEl(props.number, !props.isLeftPlayersTurn, props.turnHistory, classes)}
+                </Grid>
+                <Grid item xs={6}>
                     <Typography className={classes.markIcon} variant="h4"><MarkIcon marks={props.rightMarks} /></Typography>
                 </Grid>
                 <Grid item xs={4}>
@@ -108,4 +123,32 @@ function getPointsScoredEl(marks, number, classes, isActivePlayer) {
     }
 
     return <Typography variant="h5" className={classNames}>{"+" + pointsScored}</Typography>
+}
+
+function getLeftMarksScoredEl(number, isActivePlayer, turnHistory, classes) {
+    const originalMarksScored = turnHistory[0].leftMarks[number];
+    const currentMarksScored = turnHistory[turnHistory.length - 1].leftMarks[number];
+    const classNames = [classes.leftSideMarksScored]
+
+    return getMarksScoredEl(isActivePlayer, currentMarksScored - originalMarksScored, classNames, classes);
+}
+
+function getRightMarksScoredEl(number, isActivePlayer, turnHistory, classes) {
+    const originalMarksScored = turnHistory[0].rightMarks[number];
+    const currentMarksScored = turnHistory[turnHistory.length - 1].rightMarks[number];
+    const classNames = [classes.rightSideMarksScored]
+
+    return getMarksScoredEl(isActivePlayer, currentMarksScored - originalMarksScored, classNames, classes);
+}
+
+function getMarksScoredEl(isActivePlayer, marksThisTurn, classNames, classes) {
+    classNames.push(classes.marksScoredOnNumber);
+
+    if (marksThisTurn > 0 && isActivePlayer) {
+        classNames.push(classes.positivePointsScoredOnNumber);
+    } else {
+        classNames.push(classes.noPointsScoredOnNumber);
+    }
+
+    return <Typography variant="h5" className={classNames}>{marksThisTurn}</Typography>
 }
