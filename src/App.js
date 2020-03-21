@@ -3,7 +3,7 @@ import './App.css';
 import 'typeface-roboto';
 import Helmet from "react-helmet";
 import CricketGame from './components/cricket/CricketGame';
-import { isLeftPlayersTurn, calcMinThrowsForMarks } from "./helpers/cricket/Calculations";
+import { calcIsLeftPlayersTurn, calcMinThrowsForMarks } from "./helpers/cricket/Calculations";
 import { ThemeProvider } from "@material-ui/styles";
 import { CssBaseline, createMuiTheme } from "@material-ui/core";
 
@@ -47,14 +47,15 @@ class App extends React.Component {
         newState.history.push(this.deepCopy(newState.history[newState.actionNumber]));
         newState.actionNumber++;
         const turnNumber = newState.history[newState.actionNumber].turnNumber;
+        const isLeftPlayersTurn = calcIsLeftPlayersTurn(turnNumber);
 
-        if (isLeftPlayersTurn(turnNumber)) {
+        if (isLeftPlayersTurn) {
             newState.history[newState.actionNumber].leftMarks[number]++;
         } else {
             newState.history[newState.actionNumber].rightMarks[number]++;
         }
 
-        const numThrowsThisTurn = this.countThrowsThisTurn(this.getTurnHistory(newState), isLeftPlayersTurn(turnNumber));
+        const numThrowsThisTurn = this.countThrowsThisTurn(this.getTurnHistory(newState), isLeftPlayersTurn);
         if (numThrowsThisTurn <= 3) {
             this.setState(newState)
         }
@@ -107,7 +108,9 @@ class App extends React.Component {
 
     render() {
         const turnHistory = this.getTurnHistory(this.state);
-        const numThrowsThisTurn = this.countThrowsThisTurn(turnHistory, isLeftPlayersTurn(this.state.turnNumber));
+        const turnNumber = this.state.history[this.state.actionNumber].turnNumber;
+        const isLeftPlayersTurn = calcIsLeftPlayersTurn(turnNumber);
+        const numThrowsThisTurn = this.countThrowsThisTurn(turnHistory, isLeftPlayersTurn);
 
         return (
             <ThemeProvider theme={theme}>
@@ -126,6 +129,7 @@ class App extends React.Component {
                     undoAction={this.undoAction}
                     turnHistory={turnHistory}
                     numThrowsThisTurn={numThrowsThisTurn}
+                    isLeftPlayersTurn={isLeftPlayersTurn}
                 />
             </ThemeProvider>
         );

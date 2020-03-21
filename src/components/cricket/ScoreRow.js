@@ -79,7 +79,7 @@ export default function ScoreRow(props) {
                 </Grid>
             </Grid>
             <Grid item xs={4}>
-                <Button variant="outlined" onClick={() => props.addNewMark(props.number)}><Typography variant="h4">{props.number}</Typography></Button>
+                {getNumberButtonEl(props.addNewMark, props.number, props.numThrowsThisTurn, props.turnHistory, props.isLeftPlayersTurn)}
             </Grid>
             <Grid container item xs={4} className={rightSideClasses.join(" ")}>
                 <Grid item xs={2}>
@@ -93,6 +93,16 @@ export default function ScoreRow(props) {
                 </Grid>
             </Grid>
         </Grid>
+    );
+}
+
+function getNumberButtonEl(addNewMark, number, numThrowsThisTurn, turnHistory, isLeftPlayersTurn) {
+    const marksScored = marksScoredForNumberForTurn(isLeftPlayersTurn, turnHistory, number);
+    const scoreButtonEnabled = isScoreButtonEnabled(number, marksScored, numThrowsThisTurn);
+    return (
+        <Button variant="outlined" onClick={() => addNewMark(number)} disabled={!scoreButtonEnabled}>
+            <Typography variant="h4">{number}</Typography>
+        </Button>
     );
 }
 
@@ -132,19 +142,25 @@ function getPointsScoredEl(marks, number, classes, isActivePlayer) {
 }
 
 function getLeftMarksScoredEl(number, isActivePlayer, turnHistory, classes) {
-    const originalMarksScored = turnHistory[0].leftMarks[number];
-    const currentMarksScored = turnHistory[turnHistory.length - 1].leftMarks[number];
+    const marksScored = marksScoredForNumberForTurn(true, turnHistory, number);
     const classNames = [classes.leftSideMarksScored]
 
-    return getMarksScoredEl(isActivePlayer, currentMarksScored - originalMarksScored, classNames, classes);
+    return getMarksScoredEl(isActivePlayer, marksScored, classNames, classes);
 }
 
 function getRightMarksScoredEl(number, isActivePlayer, turnHistory, classes) {
-    const originalMarksScored = turnHistory[0].rightMarks[number];
-    const currentMarksScored = turnHistory[turnHistory.length - 1].rightMarks[number];
+    const marksScored = marksScoredForNumberForTurn(false, turnHistory, number);
     const classNames = [classes.rightSideMarksScored]
 
-    return getMarksScoredEl(isActivePlayer, currentMarksScored - originalMarksScored, classNames, classes);
+    return getMarksScoredEl(isActivePlayer, marksScored, classNames, classes);
+}
+
+function marksScoredForNumberForTurn(forLeftPlayer, turnHistory, number) {
+    const marksKey = forLeftPlayer ? "leftMarks" : "rightMarks";
+    const originalMarksScored = turnHistory[0][marksKey][number];
+    const currentMarksScored = turnHistory[turnHistory.length - 1][marksKey][number];
+
+    return currentMarksScored - originalMarksScored;
 }
 
 function getMarksScoredEl(isActivePlayer, marksThisTurn, classNames, classes) {
@@ -157,4 +173,17 @@ function getMarksScoredEl(isActivePlayer, marksThisTurn, classNames, classes) {
     }
 
     return <Typography variant="h5" className={classNames.join(" ")}>{marksThisTurn}</Typography>
+}
+
+function isScoreButtonEnabled(number, marksScoredForNumber, numThrowsThisTurn) {
+    const maxMarksPerThrowForNumber = (number === "B" ? 2 : 3);
+    const marksScoredForNumberRemainder = marksScoredForNumber % maxMarksPerThrowForNumber;
+    const throwsRemaining = 3 - numThrowsThisTurn;
+
+    if (throwsRemaining) {
+        return true;
+    } else {
+        // if no throws left, it is still possible to go from single -> double or double -> triple
+        return (marksScoredForNumberRemainder > 0) && (marksScoredForNumberRemainder < maxMarksPerThrowForNumber);
+    }
 }

@@ -24,7 +24,7 @@ export function calcPointsScored(marks, number) {
     }
 }
 
-export function isLeftPlayersTurn(turnNumber) {
+export function calcIsLeftPlayersTurn(turnNumber) {
     // if even turn num, left player's turn
     return !Boolean(turnNumber % 2);
 }
