@@ -1,3 +1,5 @@
+import { deepCopy } from "../../helpers/general/Calculations";
+
 export function calcTotalPointsScored(marksList) {
     let total = 0;
     for (let n = 20; n >= 15; n--) {
@@ -36,4 +38,38 @@ export function calcIsLeftPlayersTurn(turnNumber) {
 export function calcMinThrowsForMarks(marks, number) {
     const maxMarksPerDart = (number === "B" ? 2 : 3);
     return Math.floor(marks / maxMarksPerDart) + (marks % maxMarksPerDart ? 1 : 0);
+}
+
+export function getTurnHistory(state) {
+    let actionNum = state.actionNumber; 
+    const currentTurn = state.history[actionNum].turnNumber;
+    const turnHistory = [];
+
+    while (actionNum >= 0 && state.history[actionNum].turnNumber === currentTurn) {
+        turnHistory.push(deepCopy(state.history[actionNum]));
+        actionNum--;
+    }
+
+    return turnHistory.reverse();
+}
+
+export function countThrowsThisTurn(turnHistory, isLeftPlayersTurn) {
+    let numThrows = 0;
+    let marksKey = isLeftPlayersTurn ? "leftMarks" : "rightMarks";
+
+    ["20", "19", "18", "17", "16", "15", "B"].forEach(n => {
+        const originalMarksScored = turnHistory[0][marksKey][n];
+        const currentMarksScored = turnHistory[turnHistory.length - 1][marksKey][n];
+        const numMarks = currentMarksScored - originalMarksScored;
+        numThrows += calcMinThrowsForMarks(numMarks, n);
+    });
+
+    return numThrows;
+}
+
+export function validateState(state) {
+    const turnNumber = state.history[state.actionNumber].turnNumber;
+    const isLeftPlayersTurn = calcIsLeftPlayersTurn(turnNumber);
+    const numThrowsThisTurn = countThrowsThisTurn(getTurnHistory(state), isLeftPlayersTurn);
+    return numThrowsThisTurn <= 3;
 }
