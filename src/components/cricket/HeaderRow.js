@@ -6,7 +6,7 @@ import red from '@material-ui/core/colors/red';
 import green from '@material-ui/core/colors/green';
 import grey from '@material-ui/core/colors/grey';
 import indigo from '@material-ui/core/colors/indigo';
-import { calcTotalPointsScored } from "../../helpers/cricket/Calculations"
+import { calcTotalPointsScored, isLeftPlayersTurn } from "../../helpers/cricket/Calculations"
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
 const useStyles = makeStyles(theme => ({
@@ -144,9 +144,4 @@ function calcScoreDiff(leftScore, rightScore, turnNumber) {
     } else {
         return (rightScore - leftScore);
     }
-}
-
-function isLeftPlayersTurn(turnNumber) {
-    // if even turn num, left player's turn
-    return !Boolean(turnNumber % 2);
 }

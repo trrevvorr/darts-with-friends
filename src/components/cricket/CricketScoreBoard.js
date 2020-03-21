@@ -25,19 +25,19 @@ export default function CricketScoreBoard(props) {
                 rightMarks={props.rightMarks} 
                 turnNumber={props.turnNumber}
             />
-            {BuildScoreRows(props.leftMarks, props.rightMarks)}
+            {BuildScoreRows(props.leftMarks, props.rightMarks, props.addNewMark)}
         </Grid>
     </div>
   );
 }
 
-function BuildScoreRows(leftMarks, rightMarks) {
+function BuildScoreRows(leftMarks, rightMarks, addNewMark) {
     let scoreRows = [];
     for (let i = 20; i >= 15; i--) {
         let n = i.toString();
-        scoreRows.push(<ScoreRow number={n} leftMarks={leftMarks[n]} rightMarks={rightMarks[n]} key={i} />);
+        scoreRows.push(<ScoreRow number={n} leftMarks={leftMarks[n]} rightMarks={rightMarks[n]} addNewMark={addNewMark} key={i} />);
     }
-    scoreRows.push(<ScoreRow number={"B"} leftMarks={leftMarks["B"]} rightMarks={rightMarks["B"]} />);
+    scoreRows.push(<ScoreRow number={"B"} leftMarks={leftMarks["B"]} rightMarks={rightMarks["B"]} addNewMark={addNewMark} />);
 
     return scoreRows;
 }

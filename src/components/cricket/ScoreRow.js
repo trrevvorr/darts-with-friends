@@ -35,7 +35,7 @@ export default function ScoreRow(props) {
             </Grid>
         </Grid>
         <Grid item xs={4}>
-            <Button variant="contained"><Typography variant="h4">{props.number}</Typography></Button>
+            <Button variant="outlined" onClick={() => props.addNewMark(props.number)}><Typography variant="h4">{props.number}</Typography></Button>
         </Grid>
         <Grid container xs={4}>
         <Grid item xs={9}>

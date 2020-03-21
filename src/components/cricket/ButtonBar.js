@@ -3,9 +3,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import { Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
-import Done from '@material-ui/icons/Done';
-import Undo from '@material-ui/icons/Undo';
-
 
 const useStyles = makeStyles(theme => ({
     buttonBar: {
@@ -15,6 +12,9 @@ const useStyles = makeStyles(theme => ({
     button: {
         width: "100%",
         height: "8vh",
+    },
+    icon: {
+        marginRight: "5px",
     }
 }));
 
@@ -24,15 +24,13 @@ export default function ButtonBar(props) {
   return (
     <Grid container xs={12} className={classes.buttonBar} spacing={2}>
         <Grid item  xs={6}>
-            <Button variant="contained" className={classes.button} >
-                <Undo />
+            <Button variant="outlined" color="secondary" className={classes.button} onClick={props.undoAction}>
                 <Typography variant="h5">Undo</Typography>
             </Button>
         </Grid>
         <Grid item xs={6}>
-            <Button variant="contained" className={classes.button}>
-                <Done />
-                <Typography variant="h5">Done</Typography>
+            <Button variant="outlined" color="primary" className={classes.button} onClick={props.endTurn}>
+                <Typography variant="h5">End Turn</Typography>
             </Button>
         </Grid>
     </Grid>
