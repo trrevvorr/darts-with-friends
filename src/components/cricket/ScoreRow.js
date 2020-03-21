@@ -18,7 +18,7 @@ const useStyles = makeStyles(theme => ({
     },
     // number of points scored (when greater than 3 marks scored)
     positivePointsScoredOnNumber: {
-        color: green[200],
+        color: green[500],
     },
     noPointsScoredOnNumber: {
         display: "none",
@@ -44,24 +44,25 @@ const useStyles = makeStyles(theme => ({
         lineHeight: "9vh",
     },
     leftSideMarksScored: {
-        textAlign: "left",
-        marginLeft: "14px",
+        textAlign: "center",
     },
     rightSideMarksScored: {
-        textAlign: "right",
-        marginRight: "14px",
+        textAlign: "center",
     },
     // the "/" and "X" icons denoting marks scored per number
     markIcon: {
         height: "9vh",
         display: "flex",
         alignItems: "center",
+        justifyItems: "center"
     },
     leftMarkIcon: {
-        marginLeft: "7px",
     },
     rightMarkIcon: {
-        marginRight: "7px",
+    },
+    // the "number button" - click to score
+    scoreButton: {
+        width: "100%",
     }
 }));
 
@@ -72,25 +73,25 @@ export default function ScoreRow(props) {
 
     return (
         <Grid container item xs={12} className={classes.row}>
-            <Grid container item xs={4} className={leftSideClasses.join(" ")}>
+            <Grid container item xs={5} className={leftSideClasses.join(" ")}>
                 <Grid item xs={5}>
                     {getPointsScoredEl(props.leftMarks, props.number, classes, props.isLeftPlayersTurn)}
                 </Grid>
-                <Grid item xs={5}>
+                <Grid item xs={4}>
                     <Typography className={[classes.markIcon, classes.leftMarkIcon].join(" ")} variant="h4"><MarkIcon marks={props.leftMarks} /></Typography>
                 </Grid>
-                <Grid item xs={2}>
+                <Grid item xs={3}>
                     {getLeftMarksScoredEl(props.number, props.isLeftPlayersTurn, props.turnHistory, classes)}
                 </Grid>
             </Grid>
-            <Grid item xs={4}>
-                {getNumberButtonEl(props.addNewMark, props.number, props.numThrowsThisTurn, props.turnHistory, props.isLeftPlayersTurn)}
+            <Grid item xs={2}>
+                {getNumberButtonEl(props.addNewMark, props.number, props.numThrowsThisTurn, props.turnHistory, props.isLeftPlayersTurn, classes)}
             </Grid>
-            <Grid container item xs={4} className={rightSideClasses.join(" ")}>
-                <Grid item xs={2}>
+            <Grid container item xs={5} className={rightSideClasses.join(" ")}>
+                <Grid item xs={3}>
                     {getRightMarksScoredEl(props.number, !props.isLeftPlayersTurn, props.turnHistory, classes)}
                 </Grid>
-                <Grid item xs={5}>
+                <Grid item xs={4}>
                     <Typography className={[classes.markIcon, classes.rightMarkIcon].join(" ")} variant="h4"><MarkIcon marks={props.rightMarks} /></Typography>
                 </Grid>
                 <Grid item xs={5}>
@@ -101,11 +102,11 @@ export default function ScoreRow(props) {
     );
 }
 
-function getNumberButtonEl(addNewMark, number, numThrowsThisTurn, turnHistory, isLeftPlayersTurn) {
+function getNumberButtonEl(addNewMark, number, numThrowsThisTurn, turnHistory, isLeftPlayersTurn, classes) {
     const marksScored = marksScoredForNumberForTurn(isLeftPlayersTurn, turnHistory, number);
     const scoreButtonEnabled = isScoreButtonEnabled(number, marksScored, numThrowsThisTurn);
     return (
-        <Button variant="outlined" onClick={() => addNewMark(number)} disabled={!scoreButtonEnabled}>
+        <Button variant="contained" onClick={() => addNewMark(number)} disabled={!scoreButtonEnabled} className={classes.scoreButton}>
             <Typography variant="h4">{number}</Typography>
         </Button>
     );

@@ -13,7 +13,7 @@ import indigo from '@material-ui/core/colors/indigo';
 const useStyles = makeStyles(theme => ({
     headerRow: {
         paddingBottom: "2vh",
-        marginBottom: "3vh",
+        marginBottom: "2vh",
         height: "13vh",
         borderBottom: "2px solid " + indigo[500],
     },
