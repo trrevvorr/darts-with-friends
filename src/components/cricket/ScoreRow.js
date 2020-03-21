@@ -104,7 +104,7 @@ export default function ScoreRow(props) {
 
 function getNumberButtonEl(addNewMark, number, numThrowsThisTurn, turnHistory, isLeftPlayersTurn, classes) {
     const marksScored = marksScoredForNumberForTurn(isLeftPlayersTurn, turnHistory, number);
-    const scoreButtonEnabled = isScoreButtonEnabled(number, marksScored, numThrowsThisTurn);
+    const scoreButtonEnabled = isScoreButtonEnabled(number, marksScored, numThrowsThisTurn, isLeftPlayersTurn, turnHistory);
     return (
         <Button variant="contained" onClick={() => addNewMark(number)} disabled={!scoreButtonEnabled} className={classes.scoreButton}>
             <Typography variant="h4">{number}</Typography>
@@ -181,7 +181,14 @@ function getMarksScoredEl(isActivePlayer, marksThisTurn, classNames, classes) {
     return <Typography variant="h5" className={classNames.join(" ")}>{marksThisTurn}</Typography>
 }
 
-function isScoreButtonEnabled(number, marksScoredForNumber, numThrowsThisTurn) {
+function isScoreButtonEnabled(number, marksScoredForNumber, numThrowsThisTurn, forLeftPlayer, turnHistory) {
+    return (
+        isAdditionalMarkPossibleForNumber(number, marksScoredForNumber, numThrowsThisTurn) 
+        && isAdditionalMarkPossibleAgainstOpponentForNumber(forLeftPlayer, number, turnHistory)
+    );
+}
+
+function isAdditionalMarkPossibleForNumber(number, marksScoredForNumber, numThrowsThisTurn) {
     const maxMarksPerThrowForNumber = (number === "B" ? 2 : 3);
     const marksScoredForNumberRemainder = marksScoredForNumber % maxMarksPerThrowForNumber;
     const throwsRemaining = 3 - numThrowsThisTurn;
@@ -192,4 +199,13 @@ function isScoreButtonEnabled(number, marksScoredForNumber, numThrowsThisTurn) {
         // if no throws left, it is still possible to go from single -> double or double -> triple
         return (marksScoredForNumberRemainder > 0) && (marksScoredForNumberRemainder < maxMarksPerThrowForNumber);
     }
+}
+
+function isAdditionalMarkPossibleAgainstOpponentForNumber(forLeftPlayer, number, turnHistory) {
+    const currPlayerMarksKey = forLeftPlayer ? "leftMarks" : "rightMarks";
+    const opponentMarksKey = forLeftPlayer ? "rightMarks" : "leftMarks";
+    const currentPlayerMarksScored = turnHistory[turnHistory.length - 1][currPlayerMarksKey][number];
+    const opponentMarksScored = turnHistory[turnHistory.length - 1][opponentMarksKey][number];
+
+    return (opponentMarksScored < 3) || (currentPlayerMarksScored < 3);
 }
