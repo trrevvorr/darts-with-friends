@@ -73,8 +73,8 @@ class App extends React.Component {
     }
 
     render() {
-        const turnHistory = getTurnHistory(this.state);
         const turnNumber = this.state.history[this.state.actionNumber].turnNumber;
+        const turnHistory = getTurnHistory(this.state, turnNumber);
         const isLeftPlayersTurn = calcIsLeftPlayersTurn(turnNumber);
         const numThrowsThisTurn = countThrowsThisTurn(turnHistory, isLeftPlayersTurn);
 

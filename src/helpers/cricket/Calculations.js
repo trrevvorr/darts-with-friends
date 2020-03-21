@@ -40,12 +40,16 @@ export function calcMinThrowsForMarks(marks, number) {
     return Math.floor(marks / maxMarksPerDart) + (marks % maxMarksPerDart ? 1 : 0);
 }
 
-export function getTurnHistory(state) {
+export function getTurnHistory(state, turnNumber) {
+    if (turnNumber < 0) {
+        console.error("getTurnHistory called with negative turnIndex: " + turnNumber);
+        return [];
+    }
+
     let actionNum = state.actionNumber; 
-    const currentTurn = state.history[actionNum].turnNumber;
     const turnHistory = [];
 
-    while (actionNum >= 0 && state.history[actionNum].turnNumber === currentTurn) {
+    while (actionNum >= 0 && state.history[actionNum].turnNumber === turnNumber) {
         turnHistory.push(deepCopy(state.history[actionNum]));
         actionNum--;
     }
@@ -67,9 +71,43 @@ export function countThrowsThisTurn(turnHistory, isLeftPlayersTurn) {
     return numThrows;
 }
 
-export function validateState(state) {
-    const turnNumber = state.history[state.actionNumber].turnNumber;
-    const isLeftPlayersTurn = calcIsLeftPlayersTurn(turnNumber);
-    const numThrowsThisTurn = countThrowsThisTurn(getTurnHistory(state), isLeftPlayersTurn);
+function validateStateAgainstMarksThisTurn(state) {
+    const currentTurn = state.history[state.actionNumber].turnNumber;
+    const isLeftPlayersTurn = calcIsLeftPlayersTurn(currentTurn);
+    const numThrowsThisTurn = countThrowsThisTurn(getTurnHistory(state, currentTurn), isLeftPlayersTurn);
     return numThrowsThisTurn <= 3;
+}
+
+function validateStateAgainstOpponent(state) {
+    if (state.actionNum <= 0) {
+        return true
+    }
+
+    const currAction = state.history[state.actionNumber];
+    const prevAction = state.history[state.actionNumber - 1];
+    const isLeftPlayersTurn = calcIsLeftPlayersTurn(currAction.turnNumber);
+    const currPlayersMarksKey = isLeftPlayersTurn ? "leftMarks" : "rightMarks";
+    const currPlayersCurrMarks = currAction[currPlayersMarksKey];
+    const currPlayersPrevMarks = prevAction[currPlayersMarksKey];
+    const opponentsMarksKey = isLeftPlayersTurn ? "rightMarks" : "leftMarks";
+    const opponentsCurrMarks = currAction[opponentsMarksKey];
+
+    const numbers = ["20", "19", "18", "17", "16", "15", "B"]
+    for (let i = 0; i < numbers.length; i++) {
+        const n = numbers[i];
+        const opponentMarkCount = opponentsCurrMarks[n];
+        const currPlayerCurrMarkCount = currPlayersCurrMarks[n];
+        const currPlayersPrevMarkCount = currPlayersPrevMarks[n];
+        const marksForNumValid = (opponentMarkCount < 3) || (currPlayerCurrMarkCount <= 3) || (currPlayerCurrMarkCount === currPlayersPrevMarkCount);
+
+        if (!marksForNumValid) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+export function validateState(state) {
+    return validateStateAgainstMarksThisTurn(state) && validateStateAgainstOpponent(state);
 }
