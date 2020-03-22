@@ -3,7 +3,7 @@ import './App.css';
 import 'typeface-roboto';
 import Helmet from "react-helmet";
 import CricketGame from './components/cricket/CricketGame';
-import { calcIsLeftPlayersTurn, getTurnHistory, countThrowsThisTurn, validateState } from "./helpers/cricket/Calculations";
+import { calcIsLeftPlayersTurn, getTurnHistory, countThrowsThisTurn, validateState, calculateWinner } from "./helpers/cricket/Calculations";
 import { deepCopy } from "./helpers/general/Calculations";
 import { ThemeProvider } from "@material-ui/styles";
 import { CssBaseline, createMuiTheme } from "@material-ui/core";
@@ -77,6 +77,7 @@ class App extends React.Component {
         const turnHistory = getTurnHistory(this.state, turnNumber);
         const isLeftPlayersTurn = calcIsLeftPlayersTurn(turnNumber);
         const numThrowsThisTurn = countThrowsThisTurn(turnHistory, isLeftPlayersTurn);
+        const winner = calculateWinner(this.state, this.state.actionNumber);
 
         return (
             <ThemeProvider theme={theme}>
@@ -96,6 +97,7 @@ class App extends React.Component {
                     turnHistory={turnHistory}
                     numThrowsThisTurn={numThrowsThisTurn}
                     isLeftPlayersTurn={isLeftPlayersTurn}
+                    winner={winner}
                 />
             </ThemeProvider>
         );

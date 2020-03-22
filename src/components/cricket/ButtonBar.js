@@ -29,10 +29,14 @@ export default function ButtonBar(props) {
             </Button>
         </Grid>
         <Grid item xs={6}>
-            <Button variant="contained" color="primary" className={classes.button} onClick={props.endTurn}>
+            <Button variant="contained" color="primary" className={classes.button} onClick={props.endTurn} disabled={!isEndTurnButtonEnabled(props.winner)}>
                 <Typography variant="h5">End Turn</Typography>
             </Button>
         </Grid>
     </Grid>
   );
+}
+
+function isEndTurnButtonEnabled(winner) {
+    return winner === "";
 }

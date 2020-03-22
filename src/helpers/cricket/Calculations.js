@@ -80,7 +80,7 @@ function validateStateAgainstMarksThisTurn(state) {
 
 function validateStateAgainstOpponent(state) {
     if (state.actionNum <= 0) {
-        return true
+        return true;
     }
 
     const currAction = state.history[state.actionNumber];
@@ -89,16 +89,16 @@ function validateStateAgainstOpponent(state) {
     const currPlayersMarksKey = isLeftPlayersTurn ? "leftMarks" : "rightMarks";
     const currPlayersCurrMarks = currAction[currPlayersMarksKey];
     const currPlayersPrevMarks = prevAction[currPlayersMarksKey];
-    const opponentsMarksKey = isLeftPlayersTurn ? "rightMarks" : "leftMarks";
-    const opponentsCurrMarks = currAction[opponentsMarksKey];
+    const oppsMarksKey = isLeftPlayersTurn ? "rightMarks" : "leftMarks";
+    const oppsCurrMarks = currAction[oppsMarksKey];
 
     const numbers = ["20", "19", "18", "17", "16", "15", "B"]
     for (let i = 0; i < numbers.length; i++) {
         const n = numbers[i];
-        const opponentMarkCount = opponentsCurrMarks[n];
+        const oppMarkCount = oppsCurrMarks[n];
         const currPlayerCurrMarkCount = currPlayersCurrMarks[n];
         const currPlayersPrevMarkCount = currPlayersPrevMarks[n];
-        const marksForNumValid = (opponentMarkCount < 3) || (currPlayerCurrMarkCount <= 3) || (currPlayerCurrMarkCount === currPlayersPrevMarkCount);
+        const marksForNumValid = (oppMarkCount < 3) || (currPlayerCurrMarkCount <= 3) || (currPlayerCurrMarkCount === currPlayersPrevMarkCount);
 
         if (!marksForNumValid) {
             return false;
@@ -108,6 +108,60 @@ function validateStateAgainstOpponent(state) {
     return true;
 }
 
+function validateStateGameNotAlreadyOver(state) {
+    return calculateWinner(state, state.actionNumber - 1) === "";
+}
+
+export function calculateWinner(state, actionNumber) {
+    if (actionNumber === undefined) {
+        actionNumber = state.actionNumber;
+    }
+    if (state.actionNum <= 0) {
+        return "";
+    }
+
+    const currAction = state.history[actionNumber];
+    const isLeftPlayersTurn = calcIsLeftPlayersTurn(currAction.turnNumber);
+
+    const currPlayersMarksKey = isLeftPlayersTurn ? "leftMarks" : "rightMarks";
+    const currPlayersMarks = currAction[currPlayersMarksKey];
+    const currPlayersScore = calcTotalPointsScored(currPlayersMarks);
+    let currPlayerClosedAll = true;
+
+    const oppsMarksKey = isLeftPlayersTurn ? "rightMarks" : "leftMarks";
+    const oppsMarks = currAction[oppsMarksKey];
+    const oppsScore = calcTotalPointsScored(oppsMarks);
+    let oppClosedAll = true;
+
+    const numbers = ["20", "19", "18", "17", "16", "15", "B"]
+    for (let i = 0; i < numbers.length; i++) {
+        const n = numbers[i];
+
+        if (currPlayersMarks[n] < 3) {
+            currPlayerClosedAll = false;
+        }
+        if (oppsMarks[n] < 3) {
+            oppClosedAll = false;
+        }
+
+        if (!currPlayerClosedAll && !oppClosedAll) {
+            return "";
+        }
+    }
+
+    if (currPlayersScore >= oppsScore && currPlayerClosedAll) {
+        return isLeftPlayersTurn ? "left" : "right";
+    } else if (oppsScore >= currPlayersScore && oppClosedAll) {
+        return isLeftPlayersTurn ? "right" : "left";
+    } else {
+        return "";
+    }
+}
+
 export function validateState(state) {
-    return validateStateAgainstMarksThisTurn(state) && validateStateAgainstOpponent(state);
+    return (
+        validateStateAgainstMarksThisTurn(state) 
+        && validateStateAgainstOpponent(state)
+        && validateStateGameNotAlreadyOver(state)
+    );
 }

@@ -67,6 +67,7 @@ const useStyles = makeStyles(theme => ({
     // the "number button" - click to score
     scoreButton: {
         width: "100%",
+        height: "8vh",
     }
 }));
 
@@ -89,7 +90,7 @@ export default function ScoreRow(props) {
                 </Grid>
             </Grid>
             <Grid item xs={2}>
-                {getNumberButtonEl(props.addNewMark, props.number, props.numThrowsThisTurn, props.turnHistory, props.isLeftPlayersTurn, classes)}
+                {getNumberButtonEl(props.addNewMark, props.number, props.numThrowsThisTurn, props.turnHistory, props.isLeftPlayersTurn, classes, props.winner)}
             </Grid>
             <Grid container item xs={5} className={rightSideClasses.join(" ")}>
                 <Grid item xs={3}>
@@ -106,9 +107,9 @@ export default function ScoreRow(props) {
     );
 }
 
-function getNumberButtonEl(addNewMark, number, numThrowsThisTurn, turnHistory, isLeftPlayersTurn, classes) {
+function getNumberButtonEl(addNewMark, number, numThrowsThisTurn, turnHistory, isLeftPlayersTurn, classes, winner) {
     const marksScored = marksScoredForNumberForTurn(isLeftPlayersTurn, turnHistory, number);
-    const scoreButtonEnabled = isScoreButtonEnabled(number, marksScored, numThrowsThisTurn, isLeftPlayersTurn, turnHistory);
+    const scoreButtonEnabled = isScoreButtonEnabled(number, marksScored, numThrowsThisTurn, isLeftPlayersTurn, turnHistory, winner);
     return (
         <Button variant="contained" onClick={() => addNewMark(number)} disabled={!scoreButtonEnabled} className={classes.scoreButton}>
             <Typography variant="h4">{number}</Typography>
@@ -185,9 +186,10 @@ function getMarksScoredEl(isActivePlayer, marksThisTurn, classNames, classes) {
     return <Typography variant="h5" className={classNames.join(" ")}>{marksThisTurn}</Typography>
 }
 
-function isScoreButtonEnabled(number, marksScoredForNumber, numThrowsThisTurn, forLeftPlayer, turnHistory) {
+function isScoreButtonEnabled(number, marksScoredForNumber, numThrowsThisTurn, forLeftPlayer, turnHistory, winner) {
     return (
-        isAdditionalMarkPossibleForNumber(number, marksScoredForNumber, numThrowsThisTurn) 
+        (winner === "")
+        && isAdditionalMarkPossibleForNumber(number, marksScoredForNumber, numThrowsThisTurn) 
         && isAdditionalMarkPossibleAgainstOpponentForNumber(forLeftPlayer, number, turnHistory)
     );
 }
