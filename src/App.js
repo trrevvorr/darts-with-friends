@@ -21,9 +21,7 @@ class App extends React.Component {
             history: [
                 {
                     leftMarks: { "20": 0, "19": 0, "18": 0, "17": 0, "16": 0, "15": 0, "B": 0 },
-                    leftScore: 18,
                     rightMarks: { "20": 0, "19": 0, "18": 0, "17": 0, "16": 0, "15": 0, "B": 0 },
-                    rightScore: 0,
                     turnNumber: 0,
                 }
             ],
@@ -73,11 +71,12 @@ class App extends React.Component {
     }
 
     render() {
-        const turnNumber = this.state.history[this.state.actionNumber].turnNumber;
+        const actionNumber = this.state.actionNumber;
+        const turnNumber = this.state.history[actionNumber].turnNumber;
         const turnHistory = getTurnHistory(this.state, turnNumber);
         const isLeftPlayersTurn = calcIsLeftPlayersTurn(turnNumber);
         const numThrowsThisTurn = countThrowsThisTurn(turnHistory, isLeftPlayersTurn);
-        const winner = calculateWinner(this.state, this.state.actionNumber);
+        const winner = calculateWinner(this.state, actionNumber);
 
         return (
             <ThemeProvider theme={theme}>
@@ -90,7 +89,7 @@ class App extends React.Component {
                 <CricketGame
                     leftPlayer={this.state.leftPlayer}
                     rightPlayer={this.state.rightPlayer}
-                    turnState={this.state.history[this.state.actionNumber]}
+                    turnState={this.state.history[actionNumber]}
                     addNewMark={this.addNewMark}
                     endTurn={this.endTurn}
                     undoAction={this.undoAction}
@@ -98,6 +97,7 @@ class App extends React.Component {
                     numThrowsThisTurn={numThrowsThisTurn}
                     isLeftPlayersTurn={isLeftPlayersTurn}
                     winner={winner}
+                    actionNumber={actionNumber}
                 />
             </ThemeProvider>
         );

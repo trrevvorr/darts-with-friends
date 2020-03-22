@@ -24,7 +24,7 @@ export default function ButtonBar(props) {
   return (
     <Grid container item xs={12} className={classes.buttonBar} spacing={2}>
         <Grid item  xs={6}>
-            <Button variant="contained" color="secondary" className={classes.button} onClick={props.undoAction}>
+            <Button variant="contained" color="secondary" className={classes.button} onClick={props.undoAction} disabled={!isUndoButtonEnabled(props.actionNumber)}>
                 <Typography variant="h5">Undo</Typography>
             </Button>
         </Grid>
@@ -39,4 +39,8 @@ export default function ButtonBar(props) {
 
 function isEndTurnButtonEnabled(winner) {
     return winner === "";
+}
+
+function isUndoButtonEnabled(actionNumber) {
+    return actionNumber !== 0;
 }
