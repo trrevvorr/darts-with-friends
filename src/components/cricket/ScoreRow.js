@@ -17,16 +17,19 @@ const useStyles = makeStyles(theme => ({
         lineHeight: "9vh",
     },
     // number of points scored (when greater than 3 marks scored)
+    pointsScoredOnNumber: {
+        lineHeight: "9vh",
+        transition: "color 0.5s",
+    },
     positivePointsScoredOnNumber: {
         color: green[500],
     },
     noPointsScoredOnNumber: {
         display: "none",
     },
-    pointsScoredOnNumber: {
-        lineHeight: "9vh",
-    },
     // the left and right sides of the row (left and right player)
+    playerSide: {
+    },
     leftSide: {
         textAlign: "left",
     },
@@ -54,7 +57,8 @@ const useStyles = makeStyles(theme => ({
         height: "9vh",
         display: "flex",
         alignItems: "center",
-        justifyItems: "center"
+        justifyItems: "center",
+        transition: "color 0.5s",
     },
     leftMarkIcon: {
     },
@@ -113,7 +117,7 @@ function getNumberButtonEl(addNewMark, number, numThrowsThisTurn, turnHistory, i
 }
 
 function getLeftSideClasses(isLeftPlayersTurn, classes) {
-    const leftSideClasses = [classes.leftSide];
+    const leftSideClasses = [classes.leftSide, classes.playerSide];
     if (isLeftPlayersTurn) {
         leftSideClasses.push(classes.activeSide);
     } else {
@@ -123,7 +127,7 @@ function getLeftSideClasses(isLeftPlayersTurn, classes) {
 }
 
 function getRightSideClasses(isRightPlayersTurn, classes) {
-    const rightSideClasses = [classes.rightSide];
+    const rightSideClasses = [classes.rightSide, classes.playerSide];
     if (isRightPlayersTurn) {
         rightSideClasses.push(classes.activeSide);
     } else {

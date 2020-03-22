@@ -12,10 +12,16 @@ import indigo from '@material-ui/core/colors/indigo';
 
 const useStyles = makeStyles(theme => ({
     headerRow: {
-        paddingBottom: "2vh",
-        marginBottom: "2vh",
+        height: "15vh",
+    },
+    // score difference in the middle of header
+    scoreDiffWrapper: {
         height: "13vh",
-        borderBottom: "2px solid " + indigo[500],
+        paddingBottom: "2vh",
+    },
+    scoreDiff: {
+        marginTop: "4vh",
+        lineHeight: "6vh",
     },
     positiveScore: {
         color: green[500],
@@ -25,9 +31,12 @@ const useStyles = makeStyles(theme => ({
     negativeScore: {
         color: red[500],
     },
-    profilePicture: {
-        fontSize: "40px",
-        color: grey[500],
+    // sides of header (with player name and score)
+    playerSide: {
+        transition: "border 1s",
+        height: "13vh",
+        paddingBottom: "2vh",
+        transition: "color 0.5s",
     },
     leftSide: {
         textAlign: "left",
@@ -35,22 +44,30 @@ const useStyles = makeStyles(theme => ({
     rightSide: {
         textAlign: "right",
     },
+    activeSide: {
+    },
+    inactiveSide: {
+        color: grey[500],
+    },
     totalScore: {
         lineHeight: "5vh",
-    },
-    scoreDiff: {
-        marginTop: "4vh",
-        lineHeight: "6vh",
     },
     playerName: {
         marginTop: "1vh",
         lineHeight: "4vh",
     },
-    activeSide: {
+    // sliding divider div
+    divider: {
+        height: "2vh",
+        width: "60%",
+        borderTop: "2px solid " + indigo[500],
+        transition: "transform 0.5s",
+    },
+    dividerLeft: {
 
     },
-    inactiveSide: {
-        color: grey[500],
+    dividerRight: {
+        transform: "translateX(67%)",
     }
 }));
 
@@ -71,7 +88,7 @@ export default function HeaderRow(props) {
                 <Typography variant="h4" className={classes.totalScore}>{leftScore}</Typography>
             </Grid>
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={4} className={classes.scoreDiffWrapper}>
             {getScoreDiffElement(leftScore, rightScore, props.isLeftPlayersTurn, classes)}
         </Grid>
         <Grid container item xs={4} className={rightSideClasses.join(" ")}>
@@ -82,12 +99,13 @@ export default function HeaderRow(props) {
                 <Typography variant="h4" className={classes.totalScore}>{rightScore}</Typography>
             </Grid>
         </Grid>
+        <div className={getDividerClasses(classes, props.isLeftPlayersTurn).join(" ")}></div>
     </Grid>
   );
 }
 
 function getLeftSideClasses(isLeftPlayersTurn, classes) {
-    const leftSideClasses = [classes.leftSide];
+    const leftSideClasses = [classes.leftSide, classes.playerSide];
     if (isLeftPlayersTurn) {
         leftSideClasses.push(classes.activeSide);
     } else {
@@ -97,7 +115,7 @@ function getLeftSideClasses(isLeftPlayersTurn, classes) {
 }
 
 function getRightSideClasses(isRightPlayersTurn, classes) {
-    const rightSideClasses = [classes.rightSide];
+    const rightSideClasses = [classes.rightSide, classes.playerSide];
     if (isRightPlayersTurn) {
         rightSideClasses.push(classes.activeSide);
     } else {
@@ -131,4 +149,16 @@ function calcScoreDiff(leftScore, rightScore, isLeftPlayersTurn) {
     } else {
         return (rightScore - leftScore);
     }
+}
+
+function getDividerClasses(classes, isLeftPlayersTurn) {
+    let classNames = [classes.divider];
+
+    if (isLeftPlayersTurn) {
+        classNames.push(classes.dividerLeft);
+    } else {
+        classNames.push(classes.dividerRight);
+    }
+
+    return classNames;
 }
