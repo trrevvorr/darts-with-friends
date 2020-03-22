@@ -33,7 +33,6 @@ const useStyles = makeStyles(theme => ({
     },
     // sides of header (with player name and score)
     playerSide: {
-        transition: "border 1s",
         height: "13vh",
         paddingBottom: "2vh",
         transition: "color 0.5s",

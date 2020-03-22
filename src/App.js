@@ -6,6 +6,7 @@ import Cricket from './components/cricket/Cricket';
 import { ThemeProvider } from "@material-ui/styles";
 import { CssBaseline, createMuiTheme } from "@material-ui/core";
 import HeaderBar from "./components/general/HeaderBar";
+import { v4 as uuidv4 } from 'uuid';
 
 const theme = createMuiTheme({
     palette: {
@@ -17,6 +18,9 @@ class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            cricket: {
+                activeGameId: "1"
+            }
         };
     }
 
@@ -30,7 +34,7 @@ class App extends React.Component {
                 </Helmet>
                 <CssBaseline />
                 <HeaderBar title="Cricket" />
-                <Cricket />
+                <Cricket/>
             </ThemeProvider>
         );
     }

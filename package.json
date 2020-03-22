@@ -16,7 +16,8 @@
     "react-dom": "^16.13.0",
     "react-helmet": "^5.2.1",
     "react-scripts": "3.4.0",
-    "typeface-roboto": "0.0.75"
+    "typeface-roboto": "0.0.75",
+    "uuid": "^7.0.2"
   },
   "scripts": {
     "start": "react-scripts start",
