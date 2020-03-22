@@ -1,5 +1,4 @@
 import React from 'react';
-import HeaderBar from "../general/HeaderBar";
 import Container from "@material-ui/core/Container";
 import { makeStyles } from '@material-ui/core/styles';
 import CricketScoreBoard from './CricketScoreBoard'
@@ -10,7 +9,7 @@ const useStyles = makeStyles(theme => ({
         flexGrow: 1,
     },
     wrapper: {
-        height: "100vh",
+        height: "90vh",
     },
     fab: {
         position: "absolute",
@@ -26,7 +25,6 @@ export default function CricketGame(props) {
     return (
         <div className={classes.root}>
             <div className={classes.wrapper} >
-                <HeaderBar></HeaderBar>
                 <Container maxWidth="sm">
                     <CricketScoreBoard
                         leftPlayer={props.leftPlayer}
