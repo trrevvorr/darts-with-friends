@@ -13,6 +13,7 @@ const useStyles = makeStyles(theme => ({
     },
     title: {
         flexGrow: 1,
+        textTransform: "capitalize",
     },
     appBar: {
         width: "100%",

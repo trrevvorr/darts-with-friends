@@ -12,17 +12,17 @@ const STARTING_STATE = {
             turnNumber: 0,
         }
     ],
-    leftPlayer: "Nancy",
-    rightPlayer: "Trevor",
+    leftPlayer: "Player 1",
+    rightPlayer: "Player 2",
     actionNumber: 0,
     openGameOverDialog: false,
 };
 
 
-class App extends React.Component {
+class Cricket extends React.Component {
     constructor(props) {
         super(props);
-        this.state = STARTING_STATE;
+        this.state = this.getStartingState();
 
         this.addNewMark = this.addNewMark.bind(this);
         this.endTurn = this.endTurn.bind(this);
@@ -32,7 +32,15 @@ class App extends React.Component {
     }
 
     startNewGame() {
-        this.setState(STARTING_STATE);
+        this.setState(this.getStartingState());
+    }
+
+    getStartingState() {
+        const startingState = STARTING_STATE;
+        startingState.leftPlayer = this.props.leftName;
+        startingState.rightPlayer = this.props.rightName;
+
+        return startingState;
     }
 
     addNewMark(number) {
@@ -113,4 +121,4 @@ class App extends React.Component {
     }
 }
 
-export default App;
+export default Cricket;

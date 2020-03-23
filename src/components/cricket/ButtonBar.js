@@ -38,10 +38,6 @@ export default function ButtonBar(props) {
     );
 }
 
-function isEndTurnButtonEnabled(winner) {
-    return winner === "";
-}
-
 function getEndTurnButton(winner, endTurn, startNewGame, classes) {
     const gameOver = winner !== "";
     const buttonText = gameOver ? "New Game" : "End Turn";
