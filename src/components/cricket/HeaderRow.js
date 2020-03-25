@@ -59,7 +59,7 @@ const useStyles = makeStyles(theme => ({
     divider: {
         height: "2vh",
         width: "60%",
-        borderTop: "2px solid " + indigo[500],
+        borderTop: "3px solid " + indigo[500],
         transition: "transform 0.5s",
     },
     dividerLeft: {

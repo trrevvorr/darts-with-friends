@@ -4,7 +4,8 @@ import { calcIsLeftPlayersTurn, getTurnHistory, countThrowsThisTurn, validateSta
 import { deepCopy } from "../../helpers/general/Calculations";
 import GameOverDialog from './GameOverDialog';
 
-const STARTING_STATE = {
+const INITIAL_STATE = {
+    id: null,
     history: [
         {
             leftMarks: { "20": 0, "19": 0, "18": 0, "17": 0, "16": 0, "15": 0, "B": 0 },
@@ -22,21 +23,23 @@ const STARTING_STATE = {
 class Cricket extends React.Component {
     constructor(props) {
         super(props);
-        this.state = this.getStartingState();
+        this.state = this.initializeState();
 
         this.addNewMark = this.addNewMark.bind(this);
         this.endTurn = this.endTurn.bind(this);
         this.undoAction = this.undoAction.bind(this);
         this.closeGameOverModal = this.closeGameOverModal.bind(this);
+        this.initializeState = this.initializeState.bind(this);
         this.startNewGame = this.startNewGame.bind(this);
     }
 
     startNewGame() {
-        this.setState(this.getStartingState());
+        this.props.createNewGame();
     }
 
-    getStartingState() {
-        const startingState = STARTING_STATE;
+    initializeState() {
+        const startingState = INITIAL_STATE;
+        startingState.id = this.props.id;
         startingState.leftPlayer = this.props.leftName;
         startingState.rightPlayer = this.props.rightName;
 
