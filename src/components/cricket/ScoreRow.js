@@ -86,15 +86,15 @@ export default function ScoreRow(props) {
                     <Typography className={[classes.markIcon, classes.leftMarkIcon].join(" ")} variant="h4"><MarkIcon marks={props.leftMarks} /></Typography>
                 </Grid>
                 <Grid item xs={3}>
-                    {getLeftMarksScoredEl(props.number, props.isLeftPlayersTurn, props.turnHistory, classes)}
+                    {getLeftMarksScoredEl(props.number, props.isLeftPlayersTurn, props.turnActions, classes)}
                 </Grid>
             </Grid>
             <Grid item xs={2}>
-                {getNumberButtonEl(props.addNewMark, props.number, props.numThrowsThisTurn, props.turnHistory, props.isLeftPlayersTurn, classes, props.winner)}
+                {getNumberButtonEl(props.addNewMark, props.number, props.numThrowsThisTurn, props.turnActions, props.isLeftPlayersTurn, classes, props.gameIsWon)}
             </Grid>
             <Grid container item xs={5} className={rightSideClasses.join(" ")}>
                 <Grid item xs={3}>
-                    {getRightMarksScoredEl(props.number, !props.isLeftPlayersTurn, props.turnHistory, classes)}
+                    {getRightMarksScoredEl(props.number, !props.isLeftPlayersTurn, props.turnActions, classes)}
                 </Grid>
                 <Grid item xs={4}>
                     <Typography className={[classes.markIcon, classes.rightMarkIcon].join(" ")} variant="h4"><MarkIcon marks={props.rightMarks} /></Typography>
@@ -107,9 +107,9 @@ export default function ScoreRow(props) {
     );
 }
 
-function getNumberButtonEl(addNewMark, number, numThrowsThisTurn, turnHistory, isLeftPlayersTurn, classes, winner) {
-    const marksScored = marksScoredForNumberForTurn(isLeftPlayersTurn, turnHistory, number);
-    const scoreButtonEnabled = isScoreButtonEnabled(number, marksScored, numThrowsThisTurn, isLeftPlayersTurn, turnHistory, winner);
+function getNumberButtonEl(addNewMark, number, numThrowsThisTurn, turnActions, isLeftPlayersTurn, classes, gameIsWon) {
+    const marksScored = marksScoredForNumberForTurn(isLeftPlayersTurn, turnActions, number);
+    const scoreButtonEnabled = isScoreButtonEnabled(number, marksScored, numThrowsThisTurn, isLeftPlayersTurn, turnActions, gameIsWon);
     return (
         <Button variant="contained" onClick={() => addNewMark(number)} disabled={!scoreButtonEnabled} className={classes.scoreButton}>
             <Typography variant="h4">{number}</Typography>
@@ -152,24 +152,24 @@ function getPointsScoredEl(marks, number, classes, isActivePlayer) {
     return <Typography variant="h5" className={classNames.join(" ")}>{"+" + pointsScored}</Typography>
 }
 
-function getLeftMarksScoredEl(number, isActivePlayer, turnHistory, classes) {
-    const marksScored = marksScoredForNumberForTurn(true, turnHistory, number);
+function getLeftMarksScoredEl(number, isActivePlayer, turnActions, classes) {
+    const marksScored = marksScoredForNumberForTurn(true, turnActions, number);
     const classNames = [classes.leftSideMarksScored]
 
     return getMarksScoredEl(isActivePlayer, marksScored, classNames, classes);
 }
 
-function getRightMarksScoredEl(number, isActivePlayer, turnHistory, classes) {
-    const marksScored = marksScoredForNumberForTurn(false, turnHistory, number);
+function getRightMarksScoredEl(number, isActivePlayer, turnActions, classes) {
+    const marksScored = marksScoredForNumberForTurn(false, turnActions, number);
     const classNames = [classes.rightSideMarksScored]
 
     return getMarksScoredEl(isActivePlayer, marksScored, classNames, classes);
 }
 
-function marksScoredForNumberForTurn(forLeftPlayer, turnHistory, number) {
+function marksScoredForNumberForTurn(forLeftPlayer, turnActions, number) {
     const marksKey = forLeftPlayer ? "leftMarks" : "rightMarks";
-    const originalMarksScored = turnHistory[0][marksKey][number];
-    const currentMarksScored = turnHistory[turnHistory.length - 1][marksKey][number];
+    const originalMarksScored = turnActions[0][marksKey][number];
+    const currentMarksScored = turnActions[turnActions.length - 1][marksKey][number];
 
     return currentMarksScored - originalMarksScored;
 }
@@ -186,11 +186,11 @@ function getMarksScoredEl(isActivePlayer, marksThisTurn, classNames, classes) {
     return <Typography variant="h5" className={classNames.join(" ")}>{marksThisTurn}</Typography>
 }
 
-function isScoreButtonEnabled(number, marksScoredForNumber, numThrowsThisTurn, forLeftPlayer, turnHistory, winner) {
+function isScoreButtonEnabled(number, marksScoredForNumber, numThrowsThisTurn, forLeftPlayer, turnActions, gameIsWon) {
     return (
-        (winner === "")
+        (!gameIsWon)
         && isAdditionalMarkPossibleForNumber(number, marksScoredForNumber, numThrowsThisTurn) 
-        && isAdditionalMarkPossibleAgainstOpponentForNumber(forLeftPlayer, number, turnHistory)
+        && isAdditionalMarkPossibleAgainstOpponentForNumber(forLeftPlayer, number, turnActions)
     );
 }
 
@@ -207,11 +207,11 @@ function isAdditionalMarkPossibleForNumber(number, marksScoredForNumber, numThro
     }
 }
 
-function isAdditionalMarkPossibleAgainstOpponentForNumber(forLeftPlayer, number, turnHistory) {
+function isAdditionalMarkPossibleAgainstOpponentForNumber(forLeftPlayer, number, turnActions) {
     const currPlayerMarksKey = forLeftPlayer ? "leftMarks" : "rightMarks";
     const opponentMarksKey = forLeftPlayer ? "rightMarks" : "leftMarks";
-    const currentPlayerMarksScored = turnHistory[turnHistory.length - 1][currPlayerMarksKey][number];
-    const opponentMarksScored = turnHistory[turnHistory.length - 1][opponentMarksKey][number];
+    const currentPlayerMarksScored = turnActions[turnActions.length - 1][currPlayerMarksKey][number];
+    const opponentMarksScored = turnActions[turnActions.length - 1][opponentMarksKey][number];
 
     return (opponentMarksScored < 3) || (currentPlayerMarksScored < 3);
 }

@@ -27,21 +27,20 @@ export default function ButtonBar(props) {
     return (
         <Grid container item xs={12} className={classes.buttonBar}>
             <Grid item xs={6} className={classes.leftButtonWrapper}>
-                <Button variant="contained" color="secondary" className={classes.button} onClick={props.undoAction} disabled={!isUndoButtonEnabled(props.actionNumber)}>
+                <Button variant="contained" color="secondary" className={classes.button} onClick={props.undoAction} disabled={!isUndoButtonEnabled(props.actionIndex)}>
                     <Typography variant="h5">Undo</Typography>
                 </Button>
             </Grid>
             <Grid item xs={6} className={classes.rightButtonWrapper}>
-                {getEndTurnButton(props.winner, props.endTurn, props.startNewGame, classes)}
+                {getEndTurnButton(props.gameIsWon, props.endTurn, props.endGame, classes)}
             </Grid>
         </Grid>
     );
 }
 
-function getEndTurnButton(winner, endTurn, startNewGame, classes) {
-    const gameOver = winner !== "";
-    const buttonText = gameOver ? "New Game" : "End Turn";
-    const buttonAction = gameOver ? startNewGame : endTurn;
+function getEndTurnButton(gameIsWon, endTurn, endGame, classes) {
+    const buttonText = gameIsWon ? "New Game" : "End Turn";
+    const buttonAction = gameIsWon ? endGame : endTurn;
 
     return (
         <Button variant="contained" color="primary" className={classes.button} onClick={buttonAction}>
@@ -50,6 +49,6 @@ function getEndTurnButton(winner, endTurn, startNewGame, classes) {
     );
 }
 
-function isUndoButtonEnabled(actionNumber) {
-    return actionNumber !== 0;
+function isUndoButtonEnabled(actionIndex) {
+    return actionIndex !== 0;
 }

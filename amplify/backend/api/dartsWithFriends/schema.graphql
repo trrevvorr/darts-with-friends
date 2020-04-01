@@ -1,0 +1,62 @@
+type User @model 
+@key(fields: ["id"]) 
+@key(name: "byEmail", fields: ["email"]) {
+  id: ID!
+  email: String!
+  name: String!
+  activeMatchId: ID
+}
+
+type Match @model 
+@key(fields: ["id"]) 
+@key(name: "byUser", fields: ["userId", "createdAt"]) {
+  id: ID!
+  createdAt: String!
+  userId: ID!
+  activeGameId: ID
+  opponents: [Opponent!]! @connection(keyName: "byMatch", fields: ["id"])
+  settings: MatchSettings
+}
+type MatchSettings {
+  gameCount: Int
+  bestOf: Boolean
+}
+
+type Game @model 
+@key(fields: ["id"]) 
+@key(name: "byMatch", fields: ["matchId", "createdAt"]) {
+  id: ID!
+  createdAt: String!
+  matchId: ID!
+  type: GameType!
+  actions: [String!]!
+  settings: GameSettings
+  playerOrder: [Player!]!
+  winner: Player
+}
+type GameSettings {
+  doubleIn: Boolean
+  doubleOut: Boolean
+}
+enum GameType {
+  cricket
+  threeHundredOne
+  fiveHundredOne
+  sevenHundredOne
+  killer
+}
+type Player {
+  id: ID!
+  isUser: Boolean
+}
+
+type Opponent @model 
+@key(fields: ["id"]) 
+@key(name: "byMatch", fields: ["matchId"]) 
+@key(name: "byEmail", fields: ["email"]) {
+  id: ID!
+  name: String!
+  matchId: ID!
+  createdAt: String!
+  email: String
+}

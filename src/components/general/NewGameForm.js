@@ -1,11 +1,16 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Typography, TextField, Button } from '@material-ui/core';
+import { Typography, Button } from '@material-ui/core';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import { deepCopy } from '../../helpers/general/Calculations';
+import { createGame } from '../../graphql/mutations';
+import { v4 as uuidv4 } from 'uuid';
+import { API, graphqlOperation } from 'aws-amplify'
+import HeaderBar from './HeaderBar';
+
 
 const inputIds = {
     gameType: "select-game-type"
@@ -34,10 +39,10 @@ const useStyles = makeStyles(theme => ({
 
 function withMyHook(Component) {
     return function WrappedComponent(props) {
-      const classes = useStyles();
-      return <Component {...props} classes={classes} />;
+        const classes = useStyles();
+        return <Component {...props} classes={classes} />;
     }
-  }
+}
 
 class NewGameForm extends React.Component {
     constructor(props) {
@@ -51,7 +56,6 @@ class NewGameForm extends React.Component {
         };
 
         this.handleGameTypeChange = this.handleGameTypeChange.bind(this);
-        this.handleNameChange = this.handleNameChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
@@ -62,39 +66,42 @@ class NewGameForm extends React.Component {
         this.setState(newState);
     }
 
-    handleNameChange(event) {
-        const newState = deepCopy(this.state);
-        const nameIndex = parseInt(event.target.id.split("-")[2]);
+    async handleSubmit() {
+        const otherPlayers = this.props.opponents.map(opp => { return { id: opp.id, isUser: false }; });
+        const userPlayer = { id: this.props.userId, isUser: true };
+        const playerOrder = [userPlayer, ...otherPlayers];
 
-        newState.players[nameIndex].name = event.target.value;
-
-        this.setState(newState);
-    }
-
-    handleSubmit() {
-        const validatedPlayers = [];
-
-        for (let i = 0; i < this.state.players.length; i++) {
-            if (this.state.players[i].name === "") {
-                validatedPlayers.push({ name: "Player " + this.state.players[i] + 1 });
-            } else {
-                validatedPlayers.push({ name: this.state.players[i].name });
-            }
+        const gameInput = {
+            id: uuidv4(),
+            createdAt: (new Date()).toISOString(),
+            matchId: this.props.matchId,
+            type: this.state.gameType,
+            actions: [],
+            settings: {
+                doubleIn: null,
+                doubleOut: null,
+            },
+            playerOrder: playerOrder,
         }
 
-        const options = {
-            gameType: this.state.gameType,
-            players: validatedPlayers
+        try {
+            const newGame = await API.graphql(graphqlOperation(createGame, { input: gameInput }))
+            console.log("newGame output", newGame);
+            this.props.setActiveGame(newGame.data.createGame);
+        } catch (err) {
+            console.error("error creating game", err);
+            this.props.setErrorState("Failed to Create New Game")
         }
-        this.props.startGameWithOptions(options);
     }
 
     render() {
         const classes = this.props.classes;
         return (
-            <div className={classes.wrapper}>
-                <Typography variant="h4" className={classes.title}>Darts With Friends</Typography>
-                <FormControl className={classes.form}>
+            <>
+                <HeaderBar title={this.props.headerBarTitle} activityMenuOptions={this.props.activityMenuOptions} />
+                <div className={classes.wrapper}>
+                    <Typography variant="h4" className={classes.title}>Darts With Friends</Typography>
+                    <FormControl className={classes.form}>
                         <div className={classes.field}>
                             <InputLabel id="select-game-type-label">Game</InputLabel>
                             <Select labelId="select-game-type-label"
@@ -106,11 +113,10 @@ class NewGameForm extends React.Component {
                                 <MenuItem value={"cricket"}>Cricket</MenuItem>
                             </Select>
                         </div>
-                        <TextField className={classes.field} id="player-name-0" label="Player 1 Name" onChange={this.handleNameChange} inputProps={{ maxLength: 8 }} />
-                        <TextField className={classes.field} id="player-name-1" label="Player 2 Name" onChange={this.handleNameChange} inputProps={{ maxLength: 8 }} />
                         <Button className={classes.field} variant="contained" color="primary" onClick={this.handleSubmit}>Start Game</Button>
-                </FormControl>
-            </div>
+                    </FormControl>
+                </div>
+            </>
         );
     }
 }

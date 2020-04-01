@@ -35,11 +35,11 @@ export default function CricketGame(props) {
                         rightMarks={props.turnState.rightMarks}
                         isLeftPlayersTurn={props.isLeftPlayersTurn}
                         addNewMark={props.addNewMark}
-                        turnHistory={props.turnHistory}
+                        turnActions={props.turnActions}
                         numThrowsThisTurn={props.numThrowsThisTurn}
-                        winner={props.winner}
+                        gameIsWon={props.gameIsWon}
                     />
-                    <ButtonBar endTurn={props.endTurn} undoAction={props.undoAction} winner={props.winner} actionNumber={props.actionNumber} startNewGame={props.startNewGame}/>
+                    <ButtonBar endTurn={props.endTurn} undoAction={props.undoAction} gameIsWon={props.gameIsWon} actionIndex={props.actionIndex} endGame={props.endGame}/>
                 </Container>
             </div>
         </div>

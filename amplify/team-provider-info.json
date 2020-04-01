@@ -1,0 +1,15 @@
+{
+    "dev": {
+        "awscloudformation": {
+            "AuthRoleName": "amplify-darts-with-friends-dev-193605-authRole",
+            "UnauthRoleArn": "arn:aws:iam::855324620424:role/amplify-darts-with-friends-dev-193605-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::855324620424:role/amplify-darts-with-friends-dev-193605-authRole",
+            "Region": "us-east-1",
+            "DeploymentBucketName": "amplify-darts-with-friends-dev-193605-deployment",
+            "UnauthRoleName": "amplify-darts-with-friends-dev-193605-unauthRole",
+            "StackName": "amplify-darts-with-friends-dev-193605",
+            "StackId": "arn:aws:cloudformation:us-east-1:855324620424:stack/amplify-darts-with-friends-dev-193605/66df37e0-6ef1-11ea-ac9f-121b58656156",
+            "AmplifyAppId": "d2bbo5meqbua03"
+        }
+    }
+}

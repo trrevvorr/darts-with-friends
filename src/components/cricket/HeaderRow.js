@@ -81,7 +81,7 @@ export default function HeaderRow(props) {
     <Grid container item xs={12} className={classes.headerRow}>
         <Grid container item xs={4} className={leftSideClasses.join(" ")}>
             <Grid item xs={12}>
-                <Typography variant="h4" className={classes.playerName}>{props.leftPlayer}</Typography>
+                <Typography variant="h4" className={classes.playerName}>{props.leftPlayer.name}</Typography>
             </Grid>
             <Grid item xs={12}>
                 <Typography variant="h4" className={classes.totalScore}>{leftScore}</Typography>
@@ -92,7 +92,7 @@ export default function HeaderRow(props) {
         </Grid>
         <Grid container item xs={4} className={rightSideClasses.join(" ")}>
             <Grid item xs={12}>
-                <Typography variant="h4" className={classes.playerName}>{props.rightPlayer}</Typography>
+                <Typography variant="h4" className={classes.playerName}>{props.rightPlayer.name}</Typography>
             </Grid>
             <Grid item xs={12}>
                 <Typography variant="h4" className={classes.totalScore}>{rightScore}</Typography>
