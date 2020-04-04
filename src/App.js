@@ -5,15 +5,12 @@ import Helmet from "react-helmet";
 import Cricket from './components/cricket/Cricket';
 import { ThemeProvider } from "@material-ui/styles";
 import { CssBaseline, createMuiTheme } from "@material-ui/core";
-import { v4 as uuidv4 } from 'uuid';
 import NewGameForm from './components/general/NewGameForm';
-import { deepCopy } from './helpers/general/Calculations';
-import { API, graphqlOperation } from 'aws-amplify'
-import { updateUser, updateMatch } from './graphql/mutations'
-import { getUser, getMatch, getGame } from './graphql/queries'
+import { deepCopy, debugLog } from './helpers/general/Calculations';
 import LoadingScreen from './components/general/LoadingScreen';
 import ErrorScreen from './components/general/ErrorScreen';
 import NewMatchForm from './components/general/NewMatchForm';
+import * as Database from "./helpers/general/DatabaseOperations";
 
 const theme = createMuiTheme({
     palette: {
@@ -40,8 +37,8 @@ class App extends React.Component {
         this.setActiveGame = this.setActiveGame.bind(this);
         this.initializeState = this.initializeState.bind(this);
         this.loadUserStateFromDatabase = this.loadUserStateFromDatabase.bind(this);
-        this.loadMatchStateFromDatabase = this.loadMatchStateFromDatabase.bind(this);
-        this.loadGameStateFromDatabase = this.loadGameStateFromDatabase.bind(this);
+        this.loadMatchStateFromDatabase = this.loadActiveMatchStateFromDatabase.bind(this);
+        this.loadGameStateFromDatabase = this.loadActiveGameStateFromDatabase.bind(this);
         this.getAppPageType = this.getAppPageType.bind(this);
         this.setErrorState = this.setErrorState.bind(this);
         this.getNameByPlayerId = this.getNameByPlayerId.bind(this);
@@ -52,10 +49,7 @@ class App extends React.Component {
         this.getErrorComponent = this.getErrorComponent.bind(this);
     }
 
-    initializeState() {
-        const initialState = deepCopy(INITIAL_STATE);
-        return initialState;
-    }
+    //#region lifecycle methods
 
     componentDidMount() {
         this.loadUserStateFromDatabase();
@@ -67,11 +61,29 @@ class App extends React.Component {
         this.setErrorState("componentDidCatch");
     }
 
+    //#endregion
+
+    //#region state setters
+
+    initializeState() {
+        const initialState = deepCopy(INITIAL_STATE);
+        return initialState;
+    }
+
+    setErrorState(message) {
+        const newState = deepCopy(this.state);
+        newState.errorMessage = message;
+        this.setState(newState);
+    }
+
+    //#endregion
+
+    //#region load from database
+
     async loadUserStateFromDatabase() {
         try {
-            const user = await API.graphql(graphqlOperation(getUser, { id: this.state.userId }));
-            console.log("USER DATA", user);
-            const newState = applyUserDataToUserState(user.data.getUser, this.state);
+            const userData = await Database.getUserById(this.state.userId);
+            const newState = applyUserDataToUserState(userData, this.state);
             this.setState(newState)
         } catch (err) {
             console.error('error fetching user', err);
@@ -79,14 +91,11 @@ class App extends React.Component {
         }
     }
 
-    async loadMatchStateFromDatabase(matchId) {
+    async loadActiveMatchStateFromDatabase() {
         try {
-            const match = await API.graphql(graphqlOperation(getMatch, { id: matchId }));
-            console.log("MATCH DATA", match);
-
+            const matchData = await Database.getMatchById(this.state.activeMatchId);
             const newState = deepCopy(this.state);
-            const newMatchState = applyMatchDataToMatchState(match.data.getMatch, INITIAL_MATCH_STATE);
-            newState.activeMatch = newMatchState;
+            newState.activeMatch = applyMatchDataToMatchState(matchData, INITIAL_MATCH_STATE);
             this.setState(newState)
         } catch (err) {
             console.error('error fetching match', err);
@@ -94,21 +103,93 @@ class App extends React.Component {
         }
     }
 
-    async loadGameStateFromDatabase(gameId) {
+    async loadActiveGameStateFromDatabase() {
         try {
-            const getGameOutput = await API.graphql(graphqlOperation(getGame, { id: gameId }));
-            console.log("GAME DATA", getGameOutput);
-            const getGameData = getGameOutput.data.getGame;
+            if (!this.state.activeMatchId || !this.state.activeMatch) {
+                throw new Error(`loadActiveGameStateFromDatabase called without an active match set in state`);
+            }
 
+            const getGameData = await Database.getGameById(this.state.activeMatch.activeGameId);
             const newState = deepCopy(this.state);
-            const newGameState = applyGameDataToGameState(getGameData, INITIAL_GAME_STATE);
-            newState.activeMatch.activeGame = newGameState;
+            newState.activeMatch.activeGame = applyGameDataToGameState(getGameData, INITIAL_GAME_STATE);
             this.setState(newState)
         } catch (err) {
             console.error('error fetching game', err);
             this.setErrorState("Failed to Access Game Data");
         }
     }
+
+    //#endregion
+
+    //#region save to database
+
+    async setActiveMatch(matchData) {
+        try {
+            if (!matchData.userId || (matchData.userId !== this.state.userId)) {
+                throw new Error(`matchData.userId (${matchData.userId}) must match the userId (${this.state.userId})`);
+            }
+
+            const newState = deepCopy(this.state);
+            newState.activeMatchId = await Database.updateUserSetActiveMatch(newState.userId, matchData.id);
+            newState.activeMatch = applyMatchDataToMatchState(matchData, INITIAL_MATCH_STATE);
+            this.setState(newState);
+        } catch (err) {
+            console.error("failed to setActiveMatch", err);
+            this.setErrorState("Failed to Set Active Match");
+        }
+    }
+
+    async endActiveMatch() {
+        try {
+            const newState = deepCopy(this.state);
+            newState.activeMatchId = await Database.updateUserSetActiveMatch(newState.userId, null);
+            newState.activeMatch = null;
+            this.setState(newState);
+        } catch (err) {
+            console.error("failed to endActiveMatch", err);
+            this.setErrorState("Failed to End Match");
+        }
+    }
+
+    async setActiveGame(gameData) {
+        try {
+            if (!this.state.activeMatchId || !this.state.activeMatch) {
+                throw new Error(`setActiveGame called without an active match set in state`);
+            }
+            if (!gameData.matchId || (gameData.matchId !== this.state.activeMatchId)) {
+                throw new Error(`gameData.matchId (${gameData.matchId}) must match the activeMatchId (${this.state.activeMatchId})`);
+            }
+
+            const newState = deepCopy(this.state);
+            newState.activeMatch.activeGameId = await Database.updateMatchSetActiveGame(newState.activeMatchId, gameData.id);
+            newState.activeMatch.activeGame = applyGameDataToGameState(gameData, INITIAL_GAME_STATE);
+            this.setState(newState);
+        } catch (err) {
+            console.error("failed to setActiveGame", err);
+            this.setErrorState("Failed to Set Active Game");
+        }
+    }
+
+    async endActiveGame(doEndMatchAfter = false) {
+        try {
+            const newState = deepCopy(this.state);
+            newState.activeMatch.activeGameId = await Database.updateMatchSetActiveGame(newState.activeMatchId, null);
+            newState.activeMatch.activeGame = null;
+
+            if (doEndMatchAfter) {
+                this.endActiveMatch();
+            } else {
+                this.setState(newState);
+            }
+        } catch (err) {
+            console.error("failed to endActiveGame", err);
+            this.setErrorState("Failed to End Game");
+        }
+    }
+
+    //#endregion
+
+    //#region helper methods
 
     getNameByPlayerId(id) {
         if (id === this.state.userId) {
@@ -121,8 +202,12 @@ class App extends React.Component {
                 }
             }
         }
-        throw new Error("ame not found for id: " + id);
+        throw new Error("game not found for id: " + id);
     }
+
+    //#endregion
+
+    //#region page type handlers
 
     getAppPageType() {
         if (this.state.errorMessage) {
@@ -182,7 +267,7 @@ class App extends React.Component {
                     />;
                     break;
                 case APP_PAGE_TYPES.NO_ACTIVE_MATCH_LOADED:
-                    this.loadMatchStateFromDatabase(this.state.activeMatchId);
+                    this.loadActiveMatchStateFromDatabase();
                     pageComponent = <LoadingScreen
                         message="Loading Match"
                         headerBarTitle="Loading Match"
@@ -203,7 +288,7 @@ class App extends React.Component {
                     />;
                     break;
                 case APP_PAGE_TYPES.NO_ACTIVE_GAME_LOADED:
-                    this.loadGameStateFromDatabase(this.state.activeMatch.activeGameId);
+                    this.loadActiveGameStateFromDatabase();
                     pageComponent = <LoadingScreen
                         message="Loading Game"
                         headerBarTitle="Loading Game"
@@ -229,6 +314,10 @@ class App extends React.Component {
 
         return pageComponent;
     }
+
+    //#endregion
+
+    //#region component factories
 
     getErrorComponent(title, message) {
         const activityMenuOptions = [];
@@ -266,6 +355,7 @@ class App extends React.Component {
             leftPlayer={leftPlayer}
             rightPlayer={rightPlayer}
             endCurrentGame={this.endActiveGame}
+            endCurrentMatch={this.endActiveMatch}
             id={activeGame.id}
             key={activeGame.id}
             setErrorState={this.setErrorState}
@@ -274,132 +364,10 @@ class App extends React.Component {
         />;
     }
 
-    async onCreateNewMatch(newMatchData) {
-        const newState = deepCopy(this.state);
-        newState.matches.push(newMatchData);
-
-        const modifiedUserInput = {
-            id: newState.userId,
-            activeMatchId: newMatchData,
-        }
-
-        try {
-            const modifiedUserOutput = await API.graphql(graphqlOperation(updateUser, { input: modifiedUserInput }));
-            console.log("modifiedUserOutput", modifiedUserOutput);
-            newState.activeMatchId = modifiedUserOutput.data.updateUser.id;
-            newState.activeMatch = newMatchData;
-        } catch (err) {
-            console.error("failed to update User", err);
-            this.setErrorState("Failed to Update User");
-        }
-        this.state.activeMatchId = newMatchData.id;
-    }
-
-    setErrorState(message) {
-        const newState = deepCopy(this.state);
-        newState.errorMessage = message;
-        this.setState(newState);
-    }
-
-    async setActiveGame(gameData) {
-        try {
-            if (!gameData.matchId || (gameData.matchId !== this.state.activeMatchId)) {
-                throw new Error(`gameData.matchId (${gameData.matchId}) must match the activeMatchId (${this.state.activeMatchId})`);
-            }
-            const newGameState = applyGameDataToGameState(gameData, INITIAL_GAME_STATE);
-            const newState = deepCopy(this.state);
-            const modifiedMatchInput = {
-                id: gameData.matchId,
-                activeGameId: gameData.id,
-            }
-
-            const modifiedMatchOutput = await API.graphql(graphqlOperation(updateMatch, { input: modifiedMatchInput }));
-            const modifiedMatchData = modifiedMatchOutput.data.updateMatch;
-            newState.activeMatch.activeGameId = modifiedMatchData.activeGameId;
-            newState.activeMatch.activeGame = newGameState;
-            this.setState(newState);
-        } catch (err) {
-            console.error("failed to update set active game", err);
-            this.setErrorState("Failed to Set Active Game");
-        }
-    }
-
-    async setActiveMatch(matchData) {
-        try {
-            if (!matchData.userId || (matchData.userId !== this.state.userId)) {
-                throw new Error(`matchData.userId (${matchData.userId}) must match the userId (${this.state.userId})`);
-            }
-            const newMatchState = applyMatchDataToMatchState(matchData, INITIAL_MATCH_STATE);
-            const newState = deepCopy(this.state);
-            const modifiedUserInput = {
-                id: matchData.userId,
-                activeMatchId: matchData.id,
-            }
-
-            const modifiedUserOutput = await API.graphql(graphqlOperation(updateUser, { input: modifiedUserInput }));
-            const modifiedUserData = modifiedUserOutput.data.updateUser;
-            newState.activeMatchId = modifiedUserData.activeMatchId;
-            newState.activeMatch = newMatchState;
-            this.setState(newState);
-        } catch (err) {
-            console.error("failed to set active match", err);
-            this.setErrorState("Failed to Set Active Match");
-        }
-    }
-
-    async endActiveGame(endMatch) {
-        try {
-            const newState = deepCopy(this.state);
-            const modifiedMatchInput = {
-                id: this.state.activeMatch.id,
-                activeGameId: null,
-            }
-
-            const modifiedMatchOutput = await API.graphql(graphqlOperation(updateMatch, { input: modifiedMatchInput }));
-            const modifiedMatchData = modifiedMatchOutput.data.updateMatch;
-            newState.activeMatch.activeGameId = modifiedMatchData.activeGameId;
-            if (newState.activeMatch.activeGameId === null) {
-                newState.activeMatch.activeGame = null;
-            } else {
-                throw Error("Failed to End Active Game");
-            }
-
-            if (endMatch) {
-                this.endActiveMatch();
-            } else {
-                this.setState(newState);
-            }
-        } catch (err) {
-            console.error("failed to end active game on match", err);
-            this.setErrorState("Failed to End Game");
-        }
-    }
-
-    async endActiveMatch() {
-        try {
-            const newState = deepCopy(this.state);
-            const modifiedUserInput = {
-                id: newState.userId,
-                activeMatchId: null,
-            }
-
-            const modifiedUserOutput = await API.graphql(graphqlOperation(updateUser, { input: modifiedUserInput }));
-            const modifiedUserData = modifiedUserOutput.data.updateUser;
-            newState.activeMatchId = modifiedUserData.activeMatchId;
-            if (newState.activeMatchId === null) {
-                newState.activeMatch = null;
-            } else {
-                throw Error("Failed to End Active Match");
-            }
-            this.setState(newState);
-        } catch (err) {
-            console.error("failed to end active match on user", err);
-            this.setErrorState("Failed to End Match");
-        }
-    }
+    //#endregion
 
     render() {
-        console.log("STATE", this.state);
+        debugLog("APP STATE", this.state);
         return (
             <ThemeProvider theme={theme}>
                 <Helmet>
@@ -414,6 +382,8 @@ class App extends React.Component {
     }
 }
 
+//#region template states
+
 const INITIAL_STATE = {
     userId: "user_id", // TODO: null, this is used when mocking out graphql database
     name: null,
@@ -422,6 +392,29 @@ const INITIAL_STATE = {
     activeMatch: null,
     errorMessage: null,
 };
+
+const INITIAL_MATCH_STATE = {
+    id: null,
+    activeGameId: null,
+    createdAt: null,
+    games: null,
+    settings: null,
+    opponents: null,
+};
+
+const INITIAL_GAME_STATE = {
+    id: null,
+    createdAt: null,
+    matchId: null,
+    type: null,
+    actions: null,
+    settings: null,
+    playerOrder: null
+}
+
+//#endregion
+
+//#region database object to state mappers
 
 /**
  * given user data from database, apply it to the passed in user state object
@@ -436,15 +429,6 @@ function applyUserDataToUserState(userData, state) {
     return newState;
 }
 
-const INITIAL_MATCH_STATE = {
-    id: null,
-    activeGameId: null,
-    createdAt: null,
-    games: null,
-    settings: null,
-    opponents: null,
-};
-
 /**
  * given match data from database, apply it to the passed in match state object
  * @param {Object} matchData match database graphQL object
@@ -458,16 +442,6 @@ function applyMatchDataToMatchState(matchData, matchState) {
     newMatchState.opponents = matchData.opponents.items;
     newMatchState.settings = matchData.settings;
     return newMatchState;
-}
-
-const INITIAL_GAME_STATE = {
-    id: null,
-    createdAt: null,
-    matchId: null,
-    type: null,
-    actions: null,
-    settings: null,
-    playerOrder: null
 }
 
 /**
@@ -487,11 +461,6 @@ function applyGameDataToGameState(gameData, gameState) {
     return newGameState;
 }
 
-const INITIAL_OPPONENT_STATE = {
-    id: null,
-    name: null,
-    matchId: null,
-};
-
+//#endregion
 
 export default App;

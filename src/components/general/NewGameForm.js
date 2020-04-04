@@ -6,10 +6,9 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import { deepCopy } from '../../helpers/general/Calculations';
-import { createGame } from '../../graphql/mutations';
 import { v4 as uuidv4 } from 'uuid';
-import { API, graphqlOperation } from 'aws-amplify'
 import HeaderBar from './HeaderBar';
+import * as Database from "../../helpers/general/DatabaseOperations";
 
 
 const inputIds = {
@@ -48,11 +47,12 @@ class NewGameForm extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            id: uuidv4(),
             gameType: "cricket",
             players: [
                 { name: "Player 1" },
                 { name: "Player 2" },
-            ]
+            ],
         };
 
         this.handleGameTypeChange = this.handleGameTypeChange.bind(this);
@@ -70,24 +70,14 @@ class NewGameForm extends React.Component {
         const otherPlayers = this.props.opponents.map(opp => { return { id: opp.id, isUser: false }; });
         const userPlayer = { id: this.props.userId, isUser: true };
         const playerOrder = [userPlayer, ...otherPlayers];
-
-        const gameInput = {
-            id: uuidv4(),
-            createdAt: (new Date()).toISOString(),
-            matchId: this.props.matchId,
-            type: this.state.gameType,
-            actions: [],
-            settings: {
-                doubleIn: null,
-                doubleOut: null,
-            },
-            playerOrder: playerOrder,
-        }
+        const settings = {
+            doubleIn: null,
+            doubleOut: null,
+        };
 
         try {
-            const newGame = await API.graphql(graphqlOperation(createGame, { input: gameInput }))
-            console.log("newGame output", newGame);
-            this.props.setActiveGame(newGame.data.createGame);
+            const createGameData = await Database.createGame(this.state.id, this.props.matchId, "cricket", playerOrder, settings);
+            this.props.setActiveGame(createGameData);
         } catch (err) {
             console.error("error creating game", err);
             this.props.setErrorState("Failed to Create New Game")
@@ -100,7 +90,7 @@ class NewGameForm extends React.Component {
             <>
                 <HeaderBar title={this.props.headerBarTitle} activityMenuOptions={this.props.activityMenuOptions} />
                 <div className={classes.wrapper}>
-                    <Typography variant="h4" className={classes.title}>Darts With Friends</Typography>
+                    <Typography variant="h4" className={classes.title}>New Game</Typography>
                     <FormControl className={classes.form}>
                         <div className={classes.field}>
                             <InputLabel id="select-game-type-label">Game</InputLabel>

@@ -1,5 +1,14 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Dev Cycle
+
+### Testing
+
+1. Mock Amplify API with `amplify mock api`
+1. Set up test data by using `http://192.168.86.52:20002/`
+1. Run React app with `npm start`
+1. Navigate to `http://localhost:3000/?debug` to test using the mocked data
+
 ## Available Scripts
 
 In the project directory, you can run:
