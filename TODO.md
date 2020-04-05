@@ -3,6 +3,7 @@
 ## general
 - add unit tests
 - pass in error codes to Error page
+- handle browser back button
 
 ## Database
 - add server-side validation

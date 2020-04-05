@@ -15,9 +15,6 @@ const useStyles = makeStyles(theme => ({
     dateColumn: {
     },
     playerNames: {
-        whiteSpace: "nowrap",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
     },
     matchSettings: {
         fontStyle: "italic",
@@ -68,7 +65,7 @@ export default function PastMatch(props) {
             </Grid>
             <Grid container item className={classes.playersAndSettingsColumn} xs={4}>
                 <Grid item xs={12}>
-                    <Typography className={classes.playerNames}>{["You", ...props.opponentsNames].join(" vs ")}</Typography>
+                    <Typography className={classes.playerNames} noWrap>{["You", ...props.opponentsNames].join(" vs ")}</Typography>
                 </Grid>
                 <Grid item xs={12}>
                     <Typography className={classes.matchSettings}>{getMatchSettingsText(props.matchSettings)}</Typography>

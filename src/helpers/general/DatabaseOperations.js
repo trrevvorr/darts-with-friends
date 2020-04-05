@@ -106,6 +106,33 @@ export async function updateMatchSetActiveGame(matchId, gameId) {
 }
 
 /**
+ * given a match ID list of players, set the player(s) as the winner(s) of the match
+ * @param {string} matchId ID of match to update
+ * @param {array} winningPlayers list of player objects who won the game (multiple means it's a tie) (null means the match is incomplete)
+ * @returns {object} winningPlayers as set in database, if successful, will be same as passed in winningPlayers
+ */
+export async function updateMatchSetWinners(matchId, winningPlayers) {
+    try {
+        if (!matchId) {
+            throw new Error("at least one required parameter was not set");
+        }
+
+        const updateMatchInput = {
+            id: matchId,
+            winners: winningPlayers,
+        }
+
+        const updateMatchOutput = await API.graphql(graphqlOperation(DatabaseMutations.updateMatch, { input: updateMatchInput }));
+        debugLog("updateMatchSetWinnersOutput", updateMatchOutput);
+        const updateMatchData = updateMatchOutput.data.updateMatch;
+        return updateMatchData.winners;
+    } catch (err) {
+        console.error(err);
+        throw new Error(`failed to update match (ID ${matchId}) with winningPlayers (${winningPlayers})`);
+    }
+}
+
+/**
  * given a match ID and user ID, create a new match for a user
  * @param {string} matchId ID of match to create (must not be globally unique)
  * @param {string} userId ID of user who created match
@@ -224,7 +251,7 @@ export async function createGame(gameId, matchId, gameType, playerOrder, gameSet
 /**
  * given a match ID, get all the game object from the database that are part of that match
  * @param {string} matchId ID of match to get games for
- * @return {array} list of game database objects
+ * @return {object} object containing list of game database objects
  */
 export async function getGamesByMatchId(matchId) {
     try {
@@ -235,7 +262,7 @@ export async function getGamesByMatchId(matchId) {
         const getGamesByMatchIdOutput = await API.graphql(graphqlOperation(DatabaseQueries.getGamesByMatchId, { matchId: matchId }));
         debugLog("getGamesByMatchIdOutput", getGamesByMatchIdOutput);
         const getGamesByMatchIdData = getGamesByMatchIdOutput.data.getGamesByMatchId;
-        return getGamesByMatchIdData.items;
+        return getGamesByMatchIdData;
     } catch (err) {
         console.error(err);
         throw new Error(`failed to get game by match ID (${matchId}) from database`);

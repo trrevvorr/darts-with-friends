@@ -57,7 +57,7 @@ export const getMatch = /* GraphQL */ `
         gameCount
         bestOf
       }
-      winner {
+      winners {
         id
         isUser
       }
@@ -98,7 +98,7 @@ export const listMatchs = /* GraphQL */ `
           gameCount
           bestOf
         }
-        winner {
+        winners {
           id
           isUser
         }
@@ -241,7 +241,7 @@ export const getMatchesByUserId = /* GraphQL */ `
           gameCount
           bestOf
         }
-        winner {
+        winners {
           id
           isUser
         }

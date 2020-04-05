@@ -16,7 +16,7 @@ type Match @model
   activeGameId: ID 
   opponents: [Opponent!]! @connection(keyName: "byMatch", fields: ["id"])
   settings: MatchSettings
-  winner: [Player!]
+  winners: [Player!]
 }
 type MatchSettings {
   gameCount: Int

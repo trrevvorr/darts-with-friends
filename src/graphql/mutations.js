@@ -64,7 +64,7 @@ export const createMatch = /* GraphQL */ `
         gameCount
         bestOf
       }
-      winner {
+      winners {
         id
         isUser
       }
@@ -95,7 +95,7 @@ export const updateMatch = /* GraphQL */ `
         gameCount
         bestOf
       }
-      winner {
+      winners {
         id
         isUser
       }
@@ -126,7 +126,7 @@ export const deleteMatch = /* GraphQL */ `
         gameCount
         bestOf
       }
-      winner {
+      winners {
         id
         isUser
       }

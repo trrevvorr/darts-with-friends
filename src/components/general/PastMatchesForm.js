@@ -49,7 +49,7 @@ function getPastMatches(pastMatches, handleMatchSelect, classes) {
                     handleMatchSelect={() => handleMatchSelect(match)}
                     opponentsNames={opponentsNames}
                     matchSettings={match.settings}
-                    matchWinState={getMatchWinState(match.winner)}
+                    matchWinState={getMatchWinState(match.winners)}
                     key={match.id}
                 />
             });
@@ -61,10 +61,10 @@ function getPastMatches(pastMatches, handleMatchSelect, classes) {
     }
 }
 
-function getMatchWinState(winner) {
-    if (winner && winner.items && winner.items.length > 0) {
-        if (winner.items.length === 1) {
-            if (winner.items[0].isUser) {
+function getMatchWinState(winners) {
+    if (winners && winners.length > 0) {
+        if (winners.length === 1) {
+            if (winners[0].isUser) {
                 return "WIN";
             } else {
                 return "LOSS";

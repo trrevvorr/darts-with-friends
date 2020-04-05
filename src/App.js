@@ -47,9 +47,12 @@ class App extends React.Component {
         this.getNameByPlayerId = this.getNameByPlayerId.bind(this);
         this.endActiveGame = this.endActiveGame.bind(this);
         this.getCricketComponent = this.getCricketComponent.bind(this);
+        this.exitActiveMatch = this.exitActiveMatch.bind(this);
         this.endActiveMatch = this.endActiveMatch.bind(this);
         this.setActiveMatch = this.setActiveMatch.bind(this);
         this.getErrorComponent = this.getErrorComponent.bind(this);
+        this.determineWinnersOfActiveMatch = this.determineWinnersOfActiveMatch.bind(this);
+        this.setGamesForMatch = this.setGamesForMatch.bind(this);
     }
 
     //#region lifecycle methods
@@ -76,6 +79,12 @@ class App extends React.Component {
     setErrorState(message) {
         const newState = deepCopy(this.state);
         newState.errorMessage = message;
+        this.setState(newState);
+    }
+
+    setGamesForMatch(gamesItems) {
+        const newState = deepCopy(this.state);
+        newState.activeMatch.games = gamesItems.map(game => applyGameDataToGameState(game, INITIAL_GAME_STATE));
         this.setState(newState);
     }
 
@@ -144,13 +153,29 @@ class App extends React.Component {
 
     async endActiveMatch() {
         try {
+            if (!this.state.activeMatch) {
+                throw new Error(`endActiveMatch called without an active match set in state`);
+            }
+
+            const winners = this.determineWinnersOfActiveMatch();
+            const newState = deepCopy(this.state);
+            await Database.updateMatchSetWinners(newState.activeMatchId, winners);
+            this.exitActiveMatch();
+        } catch (err) {
+            console.error("failed to endActiveMatch", err);
+            this.setErrorState("Failed to End Match");
+        }
+    }
+
+    async exitActiveMatch() {
+        try {
             const newState = deepCopy(this.state);
             newState.activeMatchId = await Database.updateUserSetActiveMatch(newState.userId, null);
             newState.activeMatch = null;
             this.setState(newState);
         } catch (err) {
-            console.error("failed to endActiveMatch", err);
-            this.setErrorState("Failed to End Match");
+            console.error("failed to exitActiveMatch", err);
+            this.setErrorState("Failed to Exit Match");
         }
     }
 
@@ -180,7 +205,7 @@ class App extends React.Component {
             newState.activeMatch.activeGame = null;
 
             if (doEndMatchAfter) {
-                this.endActiveMatch();
+                this.exitActiveMatch();
             } else {
                 this.setState(newState);
             }
@@ -206,6 +231,37 @@ class App extends React.Component {
             }
         }
         throw new Error("opponent not found for id: " + id);
+    }
+
+    determineWinnersOfActiveMatch() {
+        if (!this.state.activeMatchId || !this.state.activeMatch) {
+            throw new Error(`setActiveGame called without an active match set in state`);
+        }
+        if (!this.state.activeMatch.games) {
+            throw new Error(`setActiveGame called without games loaded`);
+        }
+
+        const winsByPlayerId = {};
+        winsByPlayerId[this.state.userId] = 0;
+        this.state.activeMatch.opponents.forEach(opp => {
+            winsByPlayerId[opp.id] = 0;
+        });
+
+        let maxWins = 0;
+        for (let i = 0; i < this.state.activeMatch.games.length; i++) {
+            const game = this.state.activeMatch.games[i];
+            if (game.winner) {
+                winsByPlayerId[game.winner.id]++;
+                if (winsByPlayerId[game.winner.id] > maxWins) {
+                    maxWins = winsByPlayerId[game.winner.id];
+                }
+            } else {
+                return null; // if a single game is incomplete, match is incomplete
+            }
+        };
+
+        const winningPlayerIds = Object.keys(winsByPlayerId).filter(playerId => winsByPlayerId[playerId] === maxWins);
+        return winningPlayerIds.map(playerId => { return { id: playerId, isUser: playerId === this.state.userId } });
     }
 
     //#endregion
@@ -286,9 +342,17 @@ class App extends React.Component {
                         opponents={this.state.activeMatch.opponents}
                         headerBarTitle="Select Game"
                         activityMenuOptions={[
-                            { title: "End Match", handleClick: () => this.endActiveMatch() },
+                            { title: "Exit Match", handleClick: () => this.exitActiveMatch(), },
+                            {
+                                title: "End Match", handleClick: () => this.endActiveMatch(),
+                                requireConfirmation: {
+                                    message: "Ending a match permanently declares a winner and cannot be undone. If you plan to continue this match later, use the \"Exit Match\" option. If there are any games still in progress, this match will be exited instead."
+                                },
+                            },
                         ]}
                         getNameByPlayerId={this.getNameByPlayerId}
+                        setGamesForMatch={this.setGamesForMatch}
+                        games={this.state.activeMatch.games}
                     />;
                     break;
                 case APP_PAGE_TYPES.NO_ACTIVE_GAME_LOADED:
@@ -326,7 +390,7 @@ class App extends React.Component {
     getErrorComponent(title, message) {
         const activityMenuOptions = [];
         if (this.state.activeMatchId || this.state.activeMatch) {
-            activityMenuOptions.push({ title: "End Match", handleClick: () => this.endActiveMatch() });
+            activityMenuOptions.push({ title: "Exit Match", handleClick: () => this.exitActiveMatch() });
         }
         if (this.state.activeMatch && (this.state.activeMatch.activeGameId || this.state.activeMatch.activeGame)) {
             activityMenuOptions.push({ title: "End Game", handleClick: () => this.endActiveGame(false) });
@@ -359,7 +423,7 @@ class App extends React.Component {
             leftPlayer={leftPlayer}
             rightPlayer={rightPlayer}
             endCurrentGame={this.endActiveGame}
-            endCurrentMatch={this.endActiveMatch}
+            endCurrentMatch={this.exitActiveMatch}
             id={activeGame.id}
             key={activeGame.id}
             setErrorState={this.setErrorState}
@@ -404,6 +468,7 @@ const INITIAL_MATCH_STATE = {
     games: null,
     settings: null,
     opponents: null,
+    winners: null,
 };
 
 const INITIAL_GAME_STATE = {
@@ -413,7 +478,8 @@ const INITIAL_GAME_STATE = {
     type: null,
     actions: null,
     settings: null,
-    playerOrder: null
+    playerOrder: null,
+    winner: null,
 }
 
 //#endregion
@@ -445,6 +511,7 @@ function applyMatchDataToMatchState(matchData, matchState) {
     newMatchState.createdAt = matchData.createdAt;
     newMatchState.opponents = matchData.opponents.items;
     newMatchState.settings = matchData.settings;
+    newMatchState.winners = matchData.winners ? matchData.winners.items : null;
     return newMatchState;
 }
 
@@ -462,6 +529,7 @@ function applyGameDataToGameState(gameData, gameState) {
     newGameState.settings = gameData.settings;
     newGameState.playerOrder = gameData.playerOrder;
     newGameState.actions = gameData.actions;
+    newGameState.winner = gameData.winner;
     return newGameState;
 }
 

@@ -34,7 +34,6 @@ class SelectGameForm extends React.Component {
                 { name: "Player 1" },
                 { name: "Player 2" },
             ],
-            pastGames: null,
         };
 
         this.handleGameTypeChange = this.handleGameTypeChange.bind(this);
@@ -49,9 +48,7 @@ class SelectGameForm extends React.Component {
     async loadGamesInMatchFromDatabase() {
         try {
             const pastGames = await Database.getGamesByMatchId(this.props.matchId);
-            const newState = deepCopy(this.state);
-            newState.pastGames = pastGames;
-            this.setState(newState);
+            this.props.setGamesForMatch(pastGames.items);
         } catch (err) {
             console.error("failed to get games for match", err);
             this.props.setErrorState("Failed to Get Past Games")
@@ -97,7 +94,7 @@ class SelectGameForm extends React.Component {
                         />
                     </div>
                     <PastGamesForm
-                        pastGames={this.state.pastGames}
+                        pastGames={this.props.games}
                         getNameByPlayerId={this.props.getNameByPlayerId}
                         handleGameSelect={this.props.setActiveGame}
                     />
