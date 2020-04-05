@@ -27,7 +27,7 @@ export default function ButtonBar(props) {
     return (
         <Grid container item xs={12} className={classes.buttonBar}>
             <Grid item xs={6} className={classes.leftButtonWrapper}>
-                <Button variant="contained" color="secondary" className={classes.button} onClick={props.undoAction} disabled={!isUndoButtonEnabled(props.actionIndex)}>
+                <Button variant="outlined" color="primary" className={classes.button} onClick={props.undoAction} disabled={!isUndoButtonEnabled(props.actionIndex)}>
                     <Typography variant="h5">Undo</Typography>
                 </Button>
             </Grid>

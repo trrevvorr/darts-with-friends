@@ -190,3 +190,77 @@ export const listOpponents = /* GraphQL */ `
     }
   }
 `;
+export const getMatchesByUserId = /* GraphQL */ `
+  query GetMatchesByUserId(
+    $userId: ID
+    $createdAt: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelMatchFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    getMatchesByUserId(
+      userId: $userId
+      createdAt: $createdAt
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        createdAt
+        userId
+        activeGameId
+        opponents {
+          nextToken
+        }
+        settings {
+          gameCount
+          bestOf
+        }
+      }
+      nextToken
+    }
+  }
+`;
+export const getGamesByMatchId = /* GraphQL */ `
+  query GetGamesByMatchId(
+    $matchId: ID
+    $createdAt: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelGameFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    getGamesByMatchId(
+      matchId: $matchId
+      createdAt: $createdAt
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        createdAt
+        matchId
+        type
+        actions
+        settings {
+          doubleIn
+          doubleOut
+        }
+        playerOrder {
+          id
+          isUser
+        }
+        winner {
+          id
+          isUser
+        }
+      }
+      nextToken
+    }
+  }
+`;

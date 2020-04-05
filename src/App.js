@@ -5,16 +5,19 @@ import Helmet from "react-helmet";
 import Cricket from './components/cricket/Cricket';
 import { ThemeProvider } from "@material-ui/styles";
 import { CssBaseline, createMuiTheme } from "@material-ui/core";
-import NewGameForm from './components/general/NewGameForm';
+import SelectGameForm from './components/general/SelectGameForm';
 import { deepCopy, debugLog } from './helpers/general/Calculations';
 import LoadingScreen from './components/general/LoadingScreen';
 import ErrorScreen from './components/general/ErrorScreen';
 import NewMatchForm from './components/general/NewMatchForm';
 import * as Database from "./helpers/general/DatabaseOperations";
+import { blue, orange, red } from '@material-ui/core/colors';
 
 const theme = createMuiTheme({
     palette: {
-        type: "dark"
+        type: "dark",
+        primary: blue,
+        secondary: orange,
     }
 });
 
@@ -58,7 +61,7 @@ class App extends React.Component {
     componentDidCatch(error, info) {
         console.log("error", error);
         console.log("info", info);
-        this.setErrorState("componentDidCatch");
+        this.setErrorState("There was a problem loading the page. Please try ending the game, or match and starting over.");
     }
 
     //#endregion
@@ -202,7 +205,7 @@ class App extends React.Component {
                 }
             }
         }
-        throw new Error("game not found for id: " + id);
+        throw new Error("opponent not found for id: " + id);
     }
 
     //#endregion
@@ -275,7 +278,7 @@ class App extends React.Component {
                     />;
                     break;
                 case APP_PAGE_TYPES.NO_ACTIVE_GAME:
-                    pageComponent = <NewGameForm
+                    pageComponent = <SelectGameForm
                         setActiveGame={this.setActiveGame}
                         setErrorState={this.setErrorState}
                         userId={this.state.userId}
@@ -285,6 +288,7 @@ class App extends React.Component {
                         activityMenuOptions={[
                             { title: "End Match", handleClick: () => this.endActiveMatch() },
                         ]}
+                        getNameByPlayerId={this.getNameByPlayerId}
                     />;
                     break;
                 case APP_PAGE_TYPES.NO_ACTIVE_GAME_LOADED:

@@ -7,7 +7,7 @@ import { calcTotalPointsScored } from "../../helpers/cricket/Calculations"
 import red from '@material-ui/core/colors/red';
 import green from '@material-ui/core/colors/green';
 import grey from '@material-ui/core/colors/grey';
-import indigo from '@material-ui/core/colors/indigo';
+import { blue } from '@material-ui/core/colors';
 
 
 const useStyles = makeStyles(theme => ({
@@ -59,7 +59,7 @@ const useStyles = makeStyles(theme => ({
     divider: {
         height: "2vh",
         width: "60%",
-        borderTop: "3px solid " + indigo[500],
+        borderTop: "3px solid " + blue[500],
         transition: "transform 0.5s",
     },
     dividerLeft: {
@@ -71,36 +71,36 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function HeaderRow(props) {
-  const classes = useStyles();
-  const leftScore = calcTotalPointsScored(props.leftMarks);
-  const rightScore = calcTotalPointsScored(props.rightMarks);
-  const leftSideClasses = getLeftSideClasses(props.isLeftPlayersTurn, classes);
-  const rightSideClasses = getRightSideClasses(!props.isLeftPlayersTurn, classes);
+    const classes = useStyles();
+    const leftScore = calcTotalPointsScored(props.leftMarks);
+    const rightScore = calcTotalPointsScored(props.rightMarks);
+    const leftSideClasses = getLeftSideClasses(props.isLeftPlayersTurn, classes);
+    const rightSideClasses = getRightSideClasses(!props.isLeftPlayersTurn, classes);
 
-  return (
-    <Grid container item xs={12} className={classes.headerRow}>
-        <Grid container item xs={4} className={leftSideClasses.join(" ")}>
-            <Grid item xs={12}>
-                <Typography variant="h4" className={classes.playerName}>{props.leftPlayer.name}</Typography>
+    return (
+        <Grid container item xs={12} className={classes.headerRow}>
+            <Grid container item xs={4} className={leftSideClasses.join(" ")}>
+                <Grid item xs={12}>
+                    <Typography variant="h4" className={classes.playerName}>{props.leftPlayer.name}</Typography>
+                </Grid>
+                <Grid item xs={12}>
+                    <Typography variant="h4" className={classes.totalScore}>{leftScore}</Typography>
+                </Grid>
             </Grid>
-            <Grid item xs={12}>
-                <Typography variant="h4" className={classes.totalScore}>{leftScore}</Typography>
+            <Grid item xs={4} className={classes.scoreDiffWrapper}>
+                {getScoreDiffElement(leftScore, rightScore, props.isLeftPlayersTurn, classes)}
             </Grid>
+            <Grid container item xs={4} className={rightSideClasses.join(" ")}>
+                <Grid item xs={12}>
+                    <Typography variant="h4" className={classes.playerName}>{props.rightPlayer.name}</Typography>
+                </Grid>
+                <Grid item xs={12}>
+                    <Typography variant="h4" className={classes.totalScore}>{rightScore}</Typography>
+                </Grid>
+            </Grid>
+            <div className={getDividerClasses(classes, props.isLeftPlayersTurn).join(" ")}></div>
         </Grid>
-        <Grid item xs={4} className={classes.scoreDiffWrapper}>
-            {getScoreDiffElement(leftScore, rightScore, props.isLeftPlayersTurn, classes)}
-        </Grid>
-        <Grid container item xs={4} className={rightSideClasses.join(" ")}>
-            <Grid item xs={12}>
-                <Typography variant="h4" className={classes.playerName}>{props.rightPlayer.name}</Typography>
-            </Grid>
-            <Grid item xs={12}>
-                <Typography variant="h4" className={classes.totalScore}>{rightScore}</Typography>
-            </Grid>
-        </Grid>
-        <div className={getDividerClasses(classes, props.isLeftPlayersTurn).join(" ")}></div>
-    </Grid>
-  );
+    );
 }
 
 function getLeftSideClasses(isLeftPlayersTurn, classes) {
@@ -123,7 +123,7 @@ function getRightSideClasses(isRightPlayersTurn, classes) {
     return rightSideClasses;
 }
 
-function getScoreDiffElement (leftScore, rightScore, isLeftPlayersTurn, classes) {
+function getScoreDiffElement(leftScore, rightScore, isLeftPlayersTurn, classes) {
     const scoreDiff = calcScoreDiff(leftScore, rightScore, isLeftPlayersTurn)
     let className;
     let scoreDiffStr;
@@ -135,7 +135,7 @@ function getScoreDiffElement (leftScore, rightScore, isLeftPlayersTurn, classes)
         scoreDiffStr = scoreDiff.toString();
         className = classes.indifferentScore;
     } else {
-        scoreDiffStr = "+" + scoreDiff.toString(); 
+        scoreDiffStr = "+" + scoreDiff.toString();
         className = classes.positiveScore;
     }
 

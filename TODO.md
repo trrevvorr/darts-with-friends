@@ -2,29 +2,27 @@
 
 ## general
 - add unit tests
-- refactor
 - pass in error codes to Error page
 
 ## Database
 - add server-side validation
-- add auth so users can access their own data only
+- *add auth so users can access their own data only*
 - remove ability for delete operations
 - remove ability for list operations?
 
 ## User Creation
-- add user sign-up page
-- add user log-in page
+- *add user sign-up page*
+- *add user log-in page*
 - add log-out option to app menu
 
 ## New match creation
 - allow user to invite opponents to play online
-- allow selection of previous matches
+- *allow selection of previous matches*
 - allow creation of multiple opponents
 
 ## New game Creation
 - allow player reordering
 - allow random ordering
-- allow selection of previous games
 - add settings form for game
 
 ## Cricket

@@ -9,7 +9,7 @@ type User @model
 
 type Match @model 
 @key(fields: ["id"]) 
-@key(name: "byUser", fields: ["userId", "createdAt"]) {
+@key(name: "byUser", fields: ["userId", "createdAt"], queryField: "getMatchesByUserId") {
   id: ID!
   createdAt: String!
   userId: ID!
@@ -24,7 +24,7 @@ type MatchSettings {
 
 type Game @model 
 @key(fields: ["id"]) 
-@key(name: "byMatch", fields: ["matchId", "createdAt"]) {
+@key(name: "byMatch", fields: ["matchId", "createdAt"], queryField: "getGamesByMatchId") {
   id: ID!
   createdAt: String!
   matchId: ID!

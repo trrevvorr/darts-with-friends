@@ -15,7 +15,7 @@ export default function GameOverDialog(props) {
         >
             <DialogTitle id="alert-dialog-title">{winnerName + " Won!"}</DialogTitle>
             <DialogActions>
-                <Button variant="contained" onClick={props.closeGameOverModal} color="secondary">
+                <Button variant="outlined" onClick={props.closeGameOverModal} color="primary">
                     Go Back
                 </Button>
                 <Button variant="contained" onClick={props.endGame} color="primary" autoFocus>

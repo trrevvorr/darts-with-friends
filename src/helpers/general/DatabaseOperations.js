@@ -196,7 +196,28 @@ export async function createGame(gameId, matchId, gameType, playerOrder, gameSet
         return createGameData;
     } catch (err) {
         console.error(err);
-        throw new Error(`Failed to create game (ID ${gameId}) for match (ID ${matchId})`);
+        throw new Error(`Failed to create game (ID ${gameId}, Type ${gameType}) for match (ID ${matchId})`);
+    }
+}
+
+/**
+ * given a match ID, get all the game object from the database that are part of that match
+ * @param {string} matchId ID of match to get games for
+ * @return {array} list of game database objects
+ */
+export async function getGamesByMatchId(matchId) {
+    try {
+        if (!matchId) {
+            throw new Error("at least one required parameter was not set");
+        }
+
+        const getGamesByMatchIdOutput = await API.graphql(graphqlOperation(DatabaseQueries.getGamesByMatchId, { matchId: matchId }));
+        debugLog("getGamesByMatchIdOutput", getGamesByMatchIdOutput);
+        const getGamesByMatchIdData = getGamesByMatchIdOutput.data.getGamesByMatchId;
+        return getGamesByMatchIdData.items;
+    } catch (err) {
+        console.error(err);
+        throw new Error(`failed to get game by match ID (${matchId}) from database`);
     }
 }
 

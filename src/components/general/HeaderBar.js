@@ -37,7 +37,7 @@ export default function HeaderBar(props) {
     const enableActivityMenu = props.activityMenuOptions && props.activityMenuOptions.length;
 
     return (
-        <AppBar position="static" className={classes.appBar}>
+        <AppBar position="sticky" className={classes.appBar}>
             <Toolbar>
                 <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
                     <MenuIcon />
