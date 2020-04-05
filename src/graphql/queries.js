@@ -57,6 +57,10 @@ export const getMatch = /* GraphQL */ `
         gameCount
         bestOf
       }
+      winner {
+        id
+        isUser
+      }
     }
   }
 `;
@@ -81,11 +85,22 @@ export const listMatchs = /* GraphQL */ `
         userId
         activeGameId
         opponents {
+          items {
+            id
+            name
+            matchId
+            createdAt
+            email
+          }
           nextToken
         }
         settings {
           gameCount
           bestOf
+        }
+        winner {
+          id
+          isUser
         }
       }
       nextToken
@@ -213,11 +228,22 @@ export const getMatchesByUserId = /* GraphQL */ `
         userId
         activeGameId
         opponents {
+          items {
+            id
+            name
+            matchId
+            createdAt
+            email
+          }
           nextToken
         }
         settings {
           gameCount
           bestOf
+        }
+        winner {
+          id
+          isUser
         }
       }
       nextToken

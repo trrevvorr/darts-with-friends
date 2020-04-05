@@ -64,6 +64,10 @@ export const createMatch = /* GraphQL */ `
         gameCount
         bestOf
       }
+      winner {
+        id
+        isUser
+      }
     }
   }
 `;
@@ -91,6 +95,10 @@ export const updateMatch = /* GraphQL */ `
         gameCount
         bestOf
       }
+      winner {
+        id
+        isUser
+      }
     }
   }
 `;
@@ -117,6 +125,10 @@ export const deleteMatch = /* GraphQL */ `
       settings {
         gameCount
         bestOf
+      }
+      winner {
+        id
+        isUser
       }
     }
   }

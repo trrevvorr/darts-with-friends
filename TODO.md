@@ -16,8 +16,10 @@
 - add log-out option to app menu
 
 ## New match creation
+- *allow match to be ended (and a winner declared)*
 - allow user to invite opponents to play online
-- *allow selection of previous matches*
+- add support for number of games settings
+- add past matches pagination
 - allow creation of multiple opponents
 
 ## New game Creation

@@ -96,10 +96,10 @@ function getSelectGameButton(winnerName, handleGameSelect) {
 
     if (winnerName) {
         buttonText = "Review";
-        variant = "contained";
+        variant = "outlined";
     } else {
         buttonText = "Resume";
-        variant = "outlined";
+        variant = "contained";
     }
 
     return <Button variant={variant} color="primary" onClick={handleGameSelect}>{buttonText}</Button>

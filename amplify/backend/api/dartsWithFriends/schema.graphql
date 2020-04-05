@@ -13,9 +13,10 @@ type Match @model
   id: ID!
   createdAt: String!
   userId: ID!
-  activeGameId: ID
+  activeGameId: ID 
   opponents: [Opponent!]! @connection(keyName: "byMatch", fields: ["id"])
   settings: MatchSettings
+  winner: [Player!]
 }
 type MatchSettings {
   gameCount: Int
@@ -26,7 +27,7 @@ type Game @model
 @key(fields: ["id"]) 
 @key(name: "byMatch", fields: ["matchId", "createdAt"], queryField: "getGamesByMatchId") {
   id: ID!
-  createdAt: String!
+  createdAt: String! 
   matchId: ID!
   type: GameType!
   actions: [String!]!
@@ -34,7 +35,7 @@ type Game @model
   playerOrder: [Player!]!
   winner: Player
 }
-type GameSettings {
+type GameSettings { 
   doubleIn: Boolean
   doubleOut: Boolean
 }
@@ -43,7 +44,7 @@ enum GameType {
   threeHundredOne
   fiveHundredOne
   sevenHundredOne
-  killer
+  killer 
 }
 type Player {
   id: ID!

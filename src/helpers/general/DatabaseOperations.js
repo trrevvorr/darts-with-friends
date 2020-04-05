@@ -140,6 +140,27 @@ export async function createMatch(matchId, userId, gameCount = null, bestOf = fa
     }
 }
 
+/**
+ * given a user ID, get all the match object from the database that are part of that user
+ * @param {string} userId ID of user to get matches for
+ * @return {array} list of match database objects
+ */
+export async function getMatchesByUserId(userId) {
+    try {
+        if (!userId) {
+            throw new Error("at least one required parameter was not set");
+        }
+
+        const getMatchesByUserIdOutput = await API.graphql(graphqlOperation(DatabaseQueries.getMatchesByUserId, { userId: userId, sortDirection: "DESC" }));
+        debugLog("getMatchesByUserIdOutput", getMatchesByUserIdOutput);
+        const getMatchesByUserIdData = getMatchesByUserIdOutput.data.getMatchesByUserId;
+        return getMatchesByUserIdData.items;
+    } catch (err) {
+        console.error(err);
+        throw new Error(`failed to get match by user ID (${userId}) from database`);
+    }
+}
+
 //#endregion
 
 //#region Game Operations

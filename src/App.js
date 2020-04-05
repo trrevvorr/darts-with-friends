@@ -9,9 +9,9 @@ import SelectGameForm from './components/general/SelectGameForm';
 import { deepCopy, debugLog } from './helpers/general/Calculations';
 import LoadingScreen from './components/general/LoadingScreen';
 import ErrorScreen from './components/general/ErrorScreen';
-import NewMatchForm from './components/general/NewMatchForm';
+import SelectMatchForm from './components/general/SelectMatchForm';
 import * as Database from "./helpers/general/DatabaseOperations";
-import { blue, orange, red } from '@material-ui/core/colors';
+import { blue, orange, } from '@material-ui/core/colors';
 
 const theme = createMuiTheme({
     palette: {
@@ -260,7 +260,7 @@ class App extends React.Component {
                     />;
                     break;
                 case APP_PAGE_TYPES.NO_ACTIVE_MATCH:
-                    pageComponent = <NewMatchForm
+                    pageComponent = <SelectMatchForm
                         userName={this.state.name}
                         userId={this.state.userId}
                         setActiveMatch={this.setActiveMatch}
